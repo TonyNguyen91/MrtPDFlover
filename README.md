@@ -3,9 +3,13 @@
 Bộ công cụ PDF chạy hoàn toàn trong trình duyệt, **offline 100%**: không cần cài đặt, không cần mạng, tệp không rời khỏi máy.
 *A fully offline, in-browser PDF toolkit — no install, no network, your files never leave your computer.*
 
-Giao diện song ngữ **Tiếng Việt / English** (nút VI | EN ở góc trên bên phải).
+Giao diện song ngữ **Tiếng Việt / English** (nút VI / EN ở góc trên bên phải).
 
 ## Chạy thử
+
+**Dùng trực tuyến:** mở trang GitHub Pages của repo (ví dụ `https://<tài-khoản>.github.io/MrtPDFlover/`), trang sẽ tự chuyển vào app.
+
+**Dùng offline:**
 
 1. Tải repo (Code → Download ZIP) hoặc tệp `MrT-PDFlover-offline.zip` ở mục Releases.
 2. Mở `app/index.html` bằng Google Chrome hoặc Microsoft Edge (bấm đúp tệp).
@@ -51,6 +55,7 @@ Hướng dẫn chi tiết: [`app/HUONG-DAN.txt`](app/HUONG-DAN.txt).
 ```
 src/app.src.html     Mã nguồn chính (HTML + CSS + JS, một tệp)
 build.py             Đóng gói src → app/index.html (chèn doctype, charset, CSP)
+index.html           Trang chuyển hướng vào app/ (cho GitHub Pages)
 app/index.html       Bản chạy đã build
 app/lib/             Thư viện bên thứ ba + font + dữ liệu OCR (đều chạy cục bộ)
 app/HUONG-DAN.txt    Hướng dẫn sử dụng
