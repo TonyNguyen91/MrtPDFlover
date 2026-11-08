@@ -1,0 +1,88 @@
+MrT PDFlover - bộ công cụ PDF chạy offline
+==========================================
+
+CÁCH DÙNG
+1. Giải nén cả thư mục MrT-PDFlover (giữ nguyên thư mục "lib" nằm cạnh index.html).
+2. Mở index.html bằng Google Chrome hoặc Microsoft Edge (bấm đúp, hoặc kéo tệp vào cửa sổ trình duyệt).
+3. Không cần mạng, không cần cài đặt, không cần quyền quản trị. Tệp không được gửi đi đâu.
+
+Mẹo: tạo shortcut của index.html ra màn hình, hoặc đánh dấu trang (bookmark) trong trình duyệt.
+
+AN TOÀN DỮ LIỆU
+- Ứng dụng chạy hoàn toàn trên máy, không cần và không dùng mạng: không tải gì từ Internet,
+  không gửi dữ liệu đi đâu, không kiểm tra cập nhật, không thống kê sử dụng.
+- index.html có chính sách bảo mật (Content-Security-Policy) chặn mọi kết nối mạng ở mức trình duyệt:
+  trang chỉ được nạp tệp trong thư mục lib và dữ liệu tạo ra ngay trong bộ nhớ.
+- Khi chuyển HTML sang PDF, mọi ảnh/CSS/script trỏ ra Internet trong tệp HTML đều bị bỏ qua.
+- Tệp chỉ được lưu khi bạn bấm nút lưu. Trình duyệt chỉ nhớ 3 tùy chọn hiển thị (ẩn/hiện danh sách
+  trang, danh sách đối tượng và ngôn ngữ giao diện), không lưu nội dung tài liệu.
+- Tự kiểm tra: mở index.html, nhấn F12 > tab Network rồi dùng thử các chức năng; danh sách chỉ có
+  tệp cục bộ (file://), data: và blob:.
+
+NGÔN NGỮ
+- Nút VI | EN ở góc trên bên phải đổi ngôn ngữ giao diện (Tiếng Việt / English). Trong trình xem toàn
+  màn hình có nút EN/VI cạnh nút đóng. Nội dung tài liệu, tên tệp và chữ bạn gõ không bị dịch.
+
+HAI CHẾ ĐỘ
+- Bàn làm việc: gộp, sắp xếp, xoay, xóa, tách trang; đánh số trang; watermark; nén;
+  xuất ảnh; trích văn bản; OCR (tiếng Việt + tiếng Anh) ra PDF tìm kiếm được; mở khóa PDF có mật khẩu.
+- Xem & vẽ chú thích: bấm nút ⛶ trên thẻ trang (hoặc bấm đúp) để mở trang toàn màn hình.
+  Bên trái là danh sách trang (kéo thả để đổi thứ tự), lăn chuột để phóng to/thu nhỏ.
+  Bộ công cụ: Chọn (V), Ô chữ (T), Ảnh (hoặc dán Ctrl+V), Chữ nhật, Elip, Đường, Mũi tên,
+  Bút (P), Bôi vàng (H), Che trắng (W); chỉnh màu, nền, độ dày, cỡ chữ, đậm/nghiêng, căn lề, độ đậm.
+  Ctrl+Z / Ctrl+Y hoàn tác / làm lại. Chú thích được ghi vào PDF khi bấm "Tạo & lưu PDF"
+  (dạng vector, chữ vẫn chọn và tìm kiếm được).
+  Bên phải là danh sách đối tượng đã vẽ trên trang (kiểu layer): bấm để chọn, kéo thả để đổi lớp,
+  bấm đúp để đổi tên, nút mắt để ẩn (đối tượng ẩn không in ra PDF), nút khóa để chống kéo nhầm.
+  Thanh trên danh sách: nhân bản, sao chép, dán, lên trên cùng, lên/xuống một lớp, xuống dưới cùng, xóa.
+- SỬA NỘI DUNG PDF (trong trình xem toàn trang, công cụ "Sửa nội dung", phím E):
+  · Rê chuột: dòng chữ sáng khung xanh, ảnh sáng khung cam. Bấm vào dòng chữ để sửa ngay tại chỗ
+    (giữ cỡ chữ, màu, đậm/nghiêng; phông Có chân/Không chân đổi ở thanh thuộc tính).
+  · Kéo khung qua nhiều dòng để gộp thành một đoạn văn tự xuống dòng.
+  · Bấm vào ảnh để di chuyển, đổi cỡ, "Thay ảnh…" hoặc xóa.
+  · Bấm vào nét vẽ (đường thẳng, khung, hình tròn, đường cong… sáng cam khi rê chuột) để di chuyển,
+    đổi cỡ, đổi màu viền/nền, độ dày, kiểu nét (liền/đứt/chấm) hoặc Delete để xóa.
+  · Bấm đúp vào chữ của PDF (kể cả khi đang ở công cụ Chọn) để sửa ngay; bấm đúp vào ô chữ để sửa nội dung.
+  · Chọn chữ/ảnh đã sửa rồi nhấn Delete = xóa bản gốc. Xóa tiếp mục "Đã xóa…" trong danh sách = khôi phục.
+  · Khi Tạo & lưu PDF (có tích "Xóa hẳn chữ/ảnh gốc…"): chữ và ảnh gốc nằm dưới vùng sửa hoặc
+    vùng Che trắng bị xóa hẳn khỏi PDF, không chỉ bị che. Ứng dụng báo số đoạn đã xóa.
+  · Giới hạn: bản scan (ảnh) không có chữ để sửa, hãy dùng OCR hoặc Che trắng + Ô chữ. Phông chữ
+    gốc không nhúng lại được nên chữ sửa dùng phông DejaVu (có dấu tiếng Việt).
+- KÍCH THƯỚC & BONG BÓNG (trong trình xem toàn trang):
+  Lần đầu chọn công cụ đo, ứng dụng hỏi khổ giấy, tỉ lệ bản vẽ (vd 1:2), đơn vị mm/inch, số lẻ, cỡ chữ.
+  Giá trị đo = độ dài trên giấy × tỉ lệ. Đổi thiết lập (nút "A3 · 1:2 · mm" trên thanh công cụ) thì
+  mọi kích thước trên trang tự cập nhật.
+  · Kích thước (D): bấm 2 điểm rồi di chuột đặt đường kích thước, bấm để chốt. Kéo ra trên/dưới = ngang,
+    trái/phải = dọc, giữ Shift = theo đường xiên.
+  · Đường kính / Bán kính: bấm vào đường tròn hoặc cung (sáng cam khi rê chuột), hoặc chọn 3 điểm.
+  · Góc: chọn đỉnh, điểm trên cạnh 1, điểm trên cạnh 2, rồi đặt cung.
+  · Bắt điểm: tự bám vào điểm cuối □, trung điểm △, tâm ⊕, giao điểm ✕, trên nét ◇ của nét vector
+    trong PDF. Giữ Alt để tạm tắt; nút "Bắt điểm" để bật/tắt hẳn.
+  · Sửa: chọn kích thước, kéo ô vàng để dời chữ/đường kích thước, kéo ô vuông để đổi điểm đo.
+    Ô "Chữ": <> là giá trị đo, ví dụ "2x <>" hoặc "<> ±0.1".
+  · Bong bóng (B): bấm vào chi tiết rồi kéo ra để đặt; số tự tăng từ 1. Đổi số ở ô "Số" (hoặc bấm đúp),
+    kéo ô vuông ở đầu chỉ để kéo dài/ngắn; đầu chỉ: chấm tròn, mũi tên hoặc không.
+  Kích thước và bong bóng được ghi vào PDF dạng vector, chữ vẫn chọn/tìm kiếm được.
+- Phiên mới: dọn trống bàn làm việc. Nếu còn thay đổi chưa lưu, ứng dụng hỏi: Lưu rồi tạo mới /
+  Không lưu / Hủy.
+- Phiên làm việc (.plt): "Lưu phiên" (Ctrl+S) gói toàn bộ tài liệu gốc, thứ tự trang, xoay, chú thích,
+  kết quả OCR và thiết lập vào một tệp .plt. "Mở phiên" (Ctrl+O) hoặc kéo tệp .plt vào cửa sổ để làm tiếp.
+  Tệp .plt chứa bản sao tài liệu gốc nên mang sang máy khác vẫn mở được.
+- Chuyển đổi:
+  Sang PDF: Ảnh, Word (.docx), PowerPoint (.pptx), Excel (.xlsx/.xls/.csv/.ods), HTML
+  Từ PDF:   Ảnh (JPG/PNG), Word (.docx), PowerPoint (.pptx), Excel (.xlsx), PDF/A-2b
+
+LƯU Ý
+- HTML sang PDF: nếu trang dùng ảnh hoặc CSS ở tệp riêng, chọn (hoặc kéo thả) tất cả cùng lúc với tệp .html.
+- Excel sang PDF: giữ ảnh chèn trong sheet, độ rộng cột và chiều cao hàng như trong Excel.
+  Biểu đồ Excel và hình vẽ (shape) chưa hỗ trợ; ứng dụng sẽ báo số lượng bị bỏ qua.
+- Ảnh dạng EMF/WMF (thường gặp khi dán từ Visio/CAD vào Office) trình duyệt không hiển thị được;
+  ứng dụng sẽ báo số ảnh này. Hãy chèn lại dưới dạng PNG/JPG trước khi chuyển.
+- Tệp .doc / .ppt đời cũ: mở bằng Office và lưu lại thành .docx / .pptx trước.
+- Word/PowerPoint/Excel sang PDF: trang được dựng lại như trên màn hình rồi chụp thành ảnh nét cao,
+  kèm lớp chữ ẩn nên vẫn tìm kiếm và copy được. Font dùng font có sẵn trên máy.
+- PDF sang Word: chế độ "sửa được chữ" dựng lại đoạn văn, tiêu đề và bảng. Bố cục phức tạp
+  (nhiều cột, chữ trên hình) có thể lệch; khi đó dùng chế độ "giữ nguyên hình".
+- PDF/A: chế độ "an toàn" luôn tạo đúng cấu trúc PDF/A-2b. Nếu cần nộp hồ sơ chính thức,
+  có thể kiểm lại bằng phần mềm veraPDF.
+- Nếu trình duyệt hỏi "cho phép tải nhiều tệp", chọn Cho phép.

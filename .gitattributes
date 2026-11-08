@@ -1,2 +1,9 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+* text=auto eol=lf
+*.py   text eol=lf
+*.html text eol=lf
+*.md   text eol=lf
+*.txt  text eol=crlf
+
+# Bundled third-party libraries and data (large, generated): no diffs, not counted as project code
+app/lib/** -diff linguist-vendored
+app/index.html linguist-generated
