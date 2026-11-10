@@ -38,7 +38,11 @@ Giao diện song ngữ **Tiếng Việt / English** (nút VI / EN ở góc trên
 - Đo kích thước kiểu bản vẽ 2D (dài, đường kính, bán kính, góc) theo khổ giấy, tỉ lệ, mm/inch, có bắt điểm theo nét vector của PDF.
 - Bong bóng đánh số (balloon).
 
-**Phiên làm việc `.plt`**: lưu toàn bộ tài liệu, chú thích, kích thước, kết quả OCR để mở lại làm tiếp.
+**Phiên làm việc `.plt`**: lưu toàn bộ tài liệu, chú thích, kích thước, kết quả OCR để mở lại làm tiếp; lần sau Ctrl+S ghi đè thẳng lên tệp cũ.
+
+**Lịch sử thao tác**: Hoàn tác / Làm lại có tên thao tác, bảng lịch sử để quay lại nhiều bước.
+
+**Danh sách trang**: chọn nhiều trang bằng Ctrl/Shift, Delete để xóa, menu chuột phải (sao chép, dán sang phiên khác, nhân bản, xoay, xóa).
 
 Hướng dẫn chi tiết: [`app/HUONG-DAN.txt`](app/HUONG-DAN.txt).
 

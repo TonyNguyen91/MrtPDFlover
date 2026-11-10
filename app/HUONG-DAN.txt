@@ -23,6 +23,25 @@ NGÔN NGỮ
 - Nút VI | EN ở góc trên bên phải đổi ngôn ngữ giao diện (Tiếng Việt / English). Trong trình xem toàn
   màn hình có nút EN/VI cạnh nút đóng. Nội dung tài liệu, tên tệp và chữ bạn gõ không bị dịch.
 
+LƯU PHIÊN ĐÈ LÊN TỆP CŨ
+- Lần đầu bấm "Lưu phiên" (Ctrl+S), trình duyệt hỏi nơi lưu tệp .plt. Từ lần sau, Ctrl+S ghi đè luôn
+  lên đúng tệp đó, không hỏi lại. Phiên mở bằng nút "Mở phiên" (hoặc kéo tệp .plt vào) cũng được
+  lưu đè vào chính tệp đã mở. Rê chuột lên nút Lưu phiên để xem tệp đang được lưu đè.
+- Muốn lưu thành tệp khác: Ctrl+Shift+S (hoặc giữ Shift khi bấm Lưu phiên).
+- Lần đầu ghi đè, Chrome/Edge có thể hỏi "cho phép sửa tệp"; chọn Cho phép (chỉ áp dụng cho tệp đó).
+
+DANH SÁCH TRANG & LỊCH SỬ THAO TÁC
+- Trong trình xem toàn màn hình, bấm một trang ở danh sách bên trái để chọn (viền xanh).
+  Giữ Ctrl + bấm để chọn thêm/bỏ chọn nhiều trang, giữ Shift + bấm để chọn một dải trang.
+- Phím Delete: xóa các trang đang chọn (khi đang thao tác ở danh sách trang). Ctrl+C sao chép,
+  Ctrl+V dán sau trang hiện tại, Ctrl+D nhân bản, Ctrl+A chọn tất cả, R / Shift+R xoay.
+- Bấm chuột phải vào trang: Sao chép, Dán sau/trước, Nhân bản, Xoay, Chèn trang trắng, Chọn tất cả, Xóa.
+  Bàn làm việc cũng có menu chuột phải và Ctrl+C / Ctrl+V / Ctrl+D tương tự.
+- Trang đã sao chép được ghi nhớ kèm chú thích, kích thước, kết quả OCR. Có thể dán sang phiên khác
+  (sau khi bấm Phiên mới hoặc Mở phiên) trong cùng cửa sổ trình duyệt.
+- Nút ↶ / ↷ (Hoàn tác / Làm lại) trên thanh công cụ bàn làm việc và trình xem; rê chuột để xem tên
+  thao tác. Nút đồng hồ mở "Lịch sử thao tác": bấm một dòng để quay về đúng thời điểm đó.
+
 HAI CHẾ ĐỘ
 - Bàn làm việc: gộp, sắp xếp, xoay, xóa, tách trang; đánh số trang; watermark; nén;
   xuất ảnh; trích văn bản; OCR (tiếng Việt + tiếng Anh) ra PDF tìm kiếm được; mở khóa PDF có mật khẩu.

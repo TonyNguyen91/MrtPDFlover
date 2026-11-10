@@ -1,5 +1,9 @@
 # Nhật ký cập nhật
 
+## v2.1 — 2026-11-10
+
+Lưu phiên: lần sau Ctrl+S ghi đè thẳng lên tệp .plt đã lưu/đã mở, không hỏi lại (Ctrl+Shift+S = lưu thành). Danh sách trang trong trình xem: Ctrl/Shift + bấm chọn nhiều trang, Delete xóa, menu chuột phải (sao chép, dán, nhân bản, xoay, chèn trang trắng, xóa); trang sao chép dán được sang phiên khác. Nút Hoàn tác / Làm lại có tên thao tác và bảng Lịch sử thao tác để quay lại nhiều bước.
+
 ## v2.0 — 2026-11-08
 
 Chọn ngôn ngữ giao diện VI / EN ở góc trên bên phải (trình xem có nút riêng), nhớ lựa chọn. Không còn bôi đen nhầm chữ của giao diện khi kéo chuột; ô nhập liệu vẫn chọn chữ bình thường.

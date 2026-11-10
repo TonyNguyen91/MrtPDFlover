@@ -28,6 +28,21 @@ button,input,select,textarea{font:inherit;color:inherit}
 body{-webkit-user-select:none;user-select:none}
 input,textarea,[contenteditable]:not([contenteditable="false"]){-webkit-user-select:text;user-select:text}
 img,svg{-webkit-user-drag:none}
+.hgrp{display:inline-flex;gap:2px}.hgrp .btn{padding-inline:8px}.hgrp svg{width:16px;height:16px}
+.vt.picked .vt-sheet{border-color:#6f86ff;background:#1d2850}
+.vt.picked[aria-current="true"] .vt-sheet{border-color:#f4b13e;box-shadow:0 0 0 2px #6f86ff}
+.vside.focus{box-shadow:inset -2px 0 0 #6f86ff}
+.cmenu{position:fixed;z-index:1000;min-width:230px;max-width:340px;max-height:min(70vh,520px);overflow:auto;padding:5px;border-radius:10px;background:#1b2236;color:#e5e9f3;border:1px solid #303a57;box-shadow:0 12px 32px rgba(5,8,20,.45);font-size:13px}
+.cm-item{display:flex;align-items:center;gap:16px;width:100%;padding:7px 10px;border:0;border-radius:6px;background:transparent;color:inherit;text-align:left;cursor:pointer;font:inherit}
+.cm-item:hover:not(:disabled),.cm-item:focus-visible{background:#2b3760;outline:none}
+.cm-item:disabled{opacity:.42;cursor:default}
+.cm-l{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cm-item kbd{font:500 11px var(--f-mono);color:#8e98b3}
+.cm-danger{color:#ff8d80}
+.cm-sep{height:1px;background:#303a57;margin:4px 6px}
+.cm-head{padding:6px 10px 3px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8e98b3}
+.cm-hist .cm-future{color:#9aa4bf;font-style:italic}
+.cm-hist .cm-item.cm-now{opacity:1;color:#f4b13e;font-weight:600}
 .lang{display:inline-grid;grid-template-columns:auto auto;flex:none;margin-left:auto}
 .lang button{border:0;background:transparent;border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:600;font-size:12px;letter-spacing:.04em;color:var(--muted)}
 .vlang{font-size:12px;font-weight:700;letter-spacing:.04em;min-width:34px}
@@ -379,7 +394,7 @@ textarea.code{min-height:120px}
       <button class="btn" id="t-dup">Nhân đôi</button>
       <button class="btn" id="t-rev">Đảo thứ tự</button>
       <button class="btn danger" id="t-del" title="Xóa (Delete)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Xóa</button>
-      <button class="btn ghost" id="t-undo" title="Hoàn tác (Ctrl+Z)">↶ Hoàn tác</button>
+      <span class="hgrp"><button class="btn ghost" id="t-undo" title="Hoàn tác (Ctrl+Z)" aria-label="Hoàn tác"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button><button class="btn ghost" id="t-redo" title="Làm lại (Ctrl+Y)" aria-label="Làm lại"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button><button class="btn ghost" id="t-hist" title="Lịch sử thao tác" aria-label="Lịch sử thao tác"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg></button></span>
       <label class="zoom" for="zoom">Cỡ<input type="range" id="zoom" min="140" max="280" value="160"></label>
     </div>
     <div class="notice" id="sample-note" hidden><span class="tag">Mẫu</span><span>Đang hiển thị <b>tệp mẫu</b> để bạn thử. Khi bạn thêm tệp của mình, tệp mẫu sẽ tự gỡ.</span></div>
@@ -650,6 +665,7 @@ textarea.code{min-height:120px}
     <div class="rgroup">
       <button class="tbtn" id="p-undo" title="Hoàn tác (Ctrl+Z)" aria-label="Hoàn tác"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
       <button class="tbtn" id="p-redo" title="Làm lại (Ctrl+Y)" aria-label="Làm lại"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
+      <button class="tbtn" id="p-hist" title="Lịch sử thao tác" aria-label="Lịch sử thao tác"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg></button>
     </div>
   </div>
   <div class="vbody">
@@ -868,8 +884,8 @@ async function makeThumb(key){
 /* ---------- undo ---------- */
 const copyPages = () => S.pages.map(p=>({...p}));
 function snapshot(){ S.undo.push(copyPages()); if(S.undo.length>80) S.undo.shift(); S.redo.length = 0; S.dirty = true; }
-function undo(){ if(!S.undo.length){ toast('Không còn gì để hoàn tác'); return; } S.redo.push(copyPages()); S.pages = S.undo.pop(); ED.sel = null; render(); toast('Đã hoàn tác'); }
-function redo(){ if(!S.redo.length){ toast('Không còn gì để làm lại'); return; } S.undo.push(copyPages()); S.pages = S.redo.pop(); ED.sel = null; render(); toast('Đã làm lại'); }
+function undo(quiet){ if(!S.undo.length){ if(!quiet) toast('Không còn gì để hoàn tác'); return; } const lab = quiet ? '' : histItems().past[0]; S.redo.push(copyPages()); S.pages = S.undo.pop(); S.dirty = true; ED.sel = null; render(); if(!quiet) toast('Đã hoàn tác: ' + lab); }
+function redo(quiet){ if(!S.redo.length){ if(!quiet) toast('Không còn gì để làm lại'); return; } const lab = quiet ? '' : histItems().future[0]; S.undo.push(copyPages()); S.pages = S.redo.pop(); S.dirty = true; ED.sel = null; render(); if(!quiet) toast('Đã làm lại: ' + lab); }
 
 /* ---------- render ---------- */
 const ICON = {
@@ -900,7 +916,7 @@ function render(){
   $('#empty').hidden = S.pages.length>0;
   $('#sample-note').hidden = ![...S.sources.values()].some(s=>s.sample);
   renderSources(); refreshButtons(); summaries(); refreshDirty();
-  viewerSync();
+  viewerSync(); try{ refreshHist(); }catch(e){}
 }
 function renderSources(){
   const box = $('#sources'); const list=[...S.sources.values()].filter(s=>!s.temp);
@@ -918,7 +934,7 @@ function refreshButtons(){
   $('#t-count').textContent = k + ' / ' + n;
   ['t-rl','t-rr','t-left','t-right','t-dup','t-del'].forEach(id => $('#'+id).disabled = !k);
   ['t-all','t-inv','t-rev'].forEach(id => $('#'+id).disabled = !n);
-  $('#t-none').disabled = !k; $('#t-undo').disabled = !S.undo.length; $('#btn-save').disabled = S.busy || !S.pages.length; $('#btn-open').disabled = S.busy; $('#btn-new').disabled = S.busy;
+  $('#t-none').disabled = !k; $('#t-undo').disabled = !S.undo.length; $('#t-redo').disabled = !S.redo.length; $('#btn-save').disabled = S.busy || !S.pages.length; $('#btn-open').disabled = S.busy; $('#btn-new').disabled = S.busy;
   $('#sc-sel').textContent = 'Trang đã chọn (' + k + ')';
   $('#sc-all').textContent = 'Tất cả trang (' + n + ')';
   $('#sc-sel').disabled = !k;
@@ -1031,7 +1047,9 @@ const hasFiles = e => e.dataTransfer && [...e.dataTransfer.types].includes('File
 window.addEventListener('dragenter', e => { if(hasFiles(e)){ dragDepth++; mat.classList.add('files-over'); } });
 window.addEventListener('dragleave', e => { if(hasFiles(e) && --dragDepth<=0){ dragDepth=0; mat.classList.remove('files-over'); } });
 window.addEventListener('dragover', e => { if(hasFiles(e)) e.preventDefault(); });
-window.addEventListener('drop', e => { if(!hasFiles(e)) return; e.preventDefault(); dragDepth=0; mat.classList.remove('files-over'); $('#cv .drop')?.classList.remove('over');
+window.addEventListener('drop', e => { if(!hasFiles(e)) return; e.preventDefault();
+  if($('#view-convert').hidden && canPick()){ const its = [...e.dataTransfer.items].filter(i => i.kind === 'file'), fs = [...e.dataTransfer.files];
+    if(fs.length === 1 && /\.plt$/i.test(fs[0].name) && its[0] && its[0].getAsFileSystemHandle){ dragDepth = 0; mat.classList.remove('files-over'); its[0].getAsFileSystemHandle().then(h => openSession(fs[0], h && h.kind === 'file' ? h : null)).catch(() => openSession(fs[0])); return; } } dragDepth=0; mat.classList.remove('files-over'); $('#cv .drop')?.classList.remove('over');
   if(!$('#view-convert').hidden){ if(CV.cur) cvAddFiles(e.dataTransfer.files); else toast('Chọn một kiểu chuyển đổi trước'); } else addFiles(e.dataTransfer.files); });
 
 /* ---------- controls ---------- */
@@ -1053,7 +1071,7 @@ $('#t-right').onclick = () => nudge(1);
 $('#t-dup').onclick = duplicate;
 $('#t-rev').onclick = reverse;
 $('#t-del').onclick = () => del(selected());
-$('#t-undo').onclick = undo;
+$('#t-undo').onclick = () => undo();
 $('#zoom').oninput = e => document.documentElement.style.setProperty('--cw', e.target.value+'px');
 $('#sources').onclick = e => { const b=e.target.closest('[data-rm]'); if(b) removeSource(b.dataset.rm); };
 $('#scope').onclick = e => { const b=e.target.closest('button'); if(b && !b.disabled) setScope(b.dataset.scope); };
@@ -1818,7 +1836,7 @@ try{ V.side = localStorage.getItem('pdfl-side') !== '0'; }catch(e){}
 if(window.innerWidth < 640) V.side = false;
 function openViewer(i){
   if(i < 0 || !S.pages.length) return;
-  V.idx = i; V.zoom = 'fit'; V.rkey = null; ED.sel = null; ED.editing = null;
+  V.idx = i; V.zoom = 'fit'; V.rkey = null; ED.sel = null; ED.editing = null; V.ssel = new Set([S.pages[i].uid]); V.anchor = S.pages[i].uid; V.sideFocus = false;
   $('#viewer').hidden = false; document.body.style.overflow = 'hidden';
   $('#v-raster').replaceChildren();
   setSide(V.side); setLayers(V.layers); setTool(ED.tool==='image' ? 'select' : ED.tool);
@@ -1837,6 +1855,8 @@ function closeViewer(){
 function viewerSync(){
   if($('#viewer').hidden) return;
   if(!S.pages.length){ closeViewer(); return; }
+  V.idx = Math.max(0, Math.min(V.idx, S.pages.length - 1));
+  if(V.ssel){ const ids = new Set(S.pages.map(p => p.uid)); V.ssel = new Set([...V.ssel].filter(u => ids.has(u))); if(!V.ssel.size) V.ssel.add(S.pages[V.idx].uid); }
   buildSide(); viewerDraw();
 }
 async function viewerDraw(){
@@ -1847,7 +1867,7 @@ async function viewerDraw(){
   $('#v-src').textContent = s.name + (s.kind==='pdf' ? ' · tr.' + (e.index + 1) : '') + (e.rot ? ' · xoay ' + e.rot + '°' : '');
   $('#v-prev').disabled = V.idx === 0; $('#v-next').disabled = V.idx === S.pages.length - 1;
   $('#v-sel').setAttribute('aria-pressed', !!e.sel);
-  $('#p-undo').disabled = !S.undo.length; $('#p-redo').disabled = !S.redo.length;
+  $('#p-undo').disabled = !S.undo.length; $('#p-redo').disabled = !S.redo.length; try{ refreshHist(); }catch(e){}
   const [w, h] = await visualSize(e); if(tok !== V.token) return;
   V.W = w; V.H = h;
   const pg = $('#v-page'); pg.dataset.ptw = w; pg.dataset.pth = h;
@@ -1875,6 +1895,7 @@ async function viewerDraw(){
 function viewerGo(i){
   if(i < 0 || i >= S.pages.length || i === V.idx) return;
   commitText(); ED.sel = null; ED.pend = null; ED.snap = null; V.idx = i; V.rkey = null; $('#v-raster').replaceChildren();
+  V.ssel = new Set([S.pages[i].uid]);
   if(SNAP_TOOLS.has(ED.tool) && ED.snapOn) setTimeout(ensureVec, 0);
   if(ED.tool === 'edit') setTimeout(ensureEdit, 0);
   $('#v-stage').scrollTo(0, 0); markSide(true); viewerDraw();
@@ -1907,17 +1928,27 @@ function buildSide(){
   const list = $('#v-list');
   list.innerHTML = S.pages.map((p, i) => {
     const t = pageThumb(p);
-    return '<div class="vt" draggable="true" role="button" tabindex="-1" data-i="'+i+'" aria-current="'+(i===V.idx)+'" aria-label="Trang '+(i+1)+'"><span class="vt-n">'+(i+1)+'</span><div class="vt-sheet"><img alt="" draggable="false" '+(t.ann ? 'data-auid="'+p.uid+'"' : 'data-key="'+t.key+'"')+' style="transform:rotate('+p.rot+'deg)"'+(t.src ? ' src="'+t.src+'"' : '')+'>'+(p.sel ? '<span class="vt-badge" title="Trang đang được chọn"></span>' : '')+'</div></div>';
+    return '<div class="vt'+(V.ssel && V.ssel.has(p.uid) ? ' picked' : '')+'" draggable="true" role="button" tabindex="-1" data-i="'+i+'" aria-current="'+(i===V.idx)+'" aria-label="Trang '+(i+1)+'"><span class="vt-n">'+(i+1)+'</span><div class="vt-sheet"><img alt="" draggable="false" '+(t.ann ? 'data-auid="'+p.uid+'"' : 'data-key="'+t.key+'"')+' style="transform:rotate('+p.rot+'deg)"'+(t.src ? ' src="'+t.src+'"' : '')+'>'+(p.sel ? '<span class="vt-badge" title="Trang đang được chọn"></span>' : '')+'</div></div>';
   }).join('');
   markSide(false);
 }
 function markSide(scroll){
-  $$('#v-list .vt').forEach(el => el.setAttribute('aria-current', +el.dataset.i === V.idx));
+  $$('#v-list .vt').forEach(el => { const p = S.pages[+el.dataset.i]; el.setAttribute('aria-current', +el.dataset.i === V.idx); el.classList.toggle('picked', !!(p && V.ssel && V.ssel.has(p.uid))); });
   const cur = $('#v-list .vt[aria-current="true"]'); if(cur && scroll !== false) cur.scrollIntoView({ block:'nearest' });
 }
 (() => {
   const list = $('#v-list'); let from = null;
-  list.addEventListener('click', e => { const t = e.target.closest('.vt'); if(t) viewerGo(+t.dataset.i); });
+  list.addEventListener('click', e => {
+    const t = e.target.closest('.vt'); if(!t) return;
+    const i = +t.dataset.i, p = S.pages[i]; if(!p) return;
+    const before = new Set(V.ssel), mod = e.ctrlKey || e.metaKey;
+    if(mod && before.has(p.uid) && before.size > 1){ before.delete(p.uid); if(i === V.idx) viewerGo(S.pages.findIndex(q => before.has(q.uid))); V.ssel = before; markSide(false); return; }
+    if(i !== V.idx) viewerGo(i);
+    if(mod){ before.add(p.uid); V.ssel = before; V.anchor = p.uid; }
+    else if(e.shiftKey && V.anchor){ const a = S.pages.findIndex(q => q.uid === V.anchor); if(a >= 0) V.ssel = new Set(S.pages.slice(Math.min(a, i), Math.max(a, i) + 1).map(q => q.uid)); }
+    else { V.ssel = new Set([p.uid]); V.anchor = p.uid; }
+    markSide(false);
+  });
   list.addEventListener('dragstart', e => { const t = e.target.closest('.vt'); if(!t) return; from = +t.dataset.i; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'trang'); requestAnimationFrame(() => t.classList.add('dragging')); });
   const clear = () => list.querySelectorAll('.drop-before,.drop-after').forEach(x => x.classList.remove('drop-before','drop-after'));
   list.addEventListener('dragover', e => { if(from===null) return; e.preventDefault(); clear(); const t = e.target.closest('.vt'); if(!t) return; const r = t.getBoundingClientRect(); t.classList.add(e.clientY > r.top + r.height/2 ? 'drop-after' : 'drop-before'); });
@@ -1963,7 +1994,7 @@ function syncProps(){
   if(selA && document.activeElement !== $('#p-num')) $('#p-num').value = selA.text != null ? selA.text : '';
   if(selA && document.activeElement !== $('#p-dimtext')) $('#p-dimtext').value = selA.label != null ? selA.label : '';
   if(selA){ $('#p-prec').value = selA.prec != null ? String(selA.prec) : ''; if(selA.mode) $('#p-dmode').value = selA.mode; }
-  $('#p-undo').disabled = !S.undo.length; $('#p-redo').disabled = !S.redo.length;
+  $('#p-undo').disabled = !S.undo.length; $('#p-redo').disabled = !S.redo.length; try{ refreshHist(); }catch(e){}
   if(!v) return;
   $('#p-color-lbl').textContent = t === 'text' ? 'Chữ' : 'Màu';
   if(v.end) $('#p-end').value = v.end;
@@ -2053,6 +2084,7 @@ async function insertImage(file){
 $('#v-imgfile').onchange = e => { insertImage(e.target.files[0]); e.target.value = ''; };
 document.addEventListener('paste', e => {
   if($('#viewer').hidden || ED.editing) return;
+  if(V.sideFocus && PCLIP.items){ e.preventDefault(); return; }
   const f = [...(e.clipboardData?.files || [])].find(x => (x.type||'').startsWith('image/'));
   if(f){ e.preventDefault(); insertImage(f); }
   else if(ED.clip && !e.target.closest('input,textarea')){ e.preventDefault(); pasteAnn(ED.clip, 14); }
@@ -2265,6 +2297,8 @@ function viewerKey(e){
     return;
   }
   if(e.target.closest('input,select,textarea')){ if(k === 'Escape') e.target.blur(); return; }
+  if(MENU) return;
+  if(sideKey(e)) return;
   const a = selAnn();
   if(mod){
     const kl = k.toLowerCase();
@@ -3386,7 +3420,7 @@ $('#p-family').onchange = async e => { if(e.target.value === 'serif') await load
 /* =====================================================================
    LANGUAGE (VI / EN) — interface translation, user content untouched
    ===================================================================== */
-const I18N_EN = {"Trang PDF":"PDF page","xoay":"rotate","Cỡ":"Size","Lề":"Margin","Số":"No.","Ẩn":"Hide","Bút":"Pen","Chữ":"Text","Dán":"Paste","Dọc":"Portrait","Góc":"Angle","Hủy":"Cancel","Màu":"Color","Mẫu":"Template","Nét":"Stroke","Nền":"Fill","Tạo":"Create","Vừa":"Fit","Trung bình":"Medium","Xóa":"Delete","chữ":"text","dọc":"portrait","gốc":"original","nén":"compress","tâm":"center","Đậm":"Bold","Ảnh":"Image","ảnh":"image","Bắt:":"Snap:","Chấm":"Dotted","Chọn":"Select","Dừng":"Stop","Khóa":"Lock","Kiểu":"Style","Liền":"Solid","Lỗi:":"Error:","Tách":"Split","hoặc":"or","Đóng":"Close","” có":"” has","Không":"None","Phông":"Font","Số lẻ":"Decimals","không":"no","ký tự":"characters","trắng":"white","xóa ·":"delete ·","Ô chữ":"Text box","Đường":"Line","A4 dọc":"A4 portrait","Bỏ qua":"Skip","Bỏ tệp":"Remove file","Bố trí":"Layout","Chế độ":"Mode","Chủ đề":"Subject","Cỡ chữ":"Font size","Cứ mỗi":"Every","Lưu ý:":"Note:","Ra ảnh":"To image","Tất cả":"All","Vị trí":"Position","bỏ qua":"skip","kéo ra":"drag out","nét vẽ":"strokes","Đã lưu":"Saved","Đã tạo":"Created","Đã xóa":"Deleted","Đã đưa":"Moved","Đơn vị":"Unit","Độ nét":"Sharpness","Độ đậm":"Weight","Bấm vào":"Click","Bỏ chọn":"Deselect","Có chân":"With footer","Công cụ":"Tools","Làm lại":"Redo","Lưu lại":"Save","Mũi tên":"Arrow","Mở khóa":"Unlock","Nghiêng":"Italic","Nét bút":"Pen stroke","Nét đứt":"Dashed","Rất nét":"Very sharp","Sẽ xuất":"Will export","Thu nhỏ":"Zoom out","Tiêu đề":"Title","Tác giả":"Author","Tên tệp":"File name","Từ khóa":"Keywords","Văn bản":"Text","tệp mẫu":"sample files","vào đây":"here","Đa giác":"Polygon","Đang mở":"Opening","Đầu chỉ":"Leader end","Bán kính":"Radius","Bôi vàng":"Highlight","Bắt điểm":"Snap","Chéo 45°":"Diagonal 45°","Chạy OCR":"Run OCR","Chọn hết":"Select all","Chọn tệp":"Choose file","Chữ gốc:":"Original text:","Chữ nhật":"Rectangle","Cách làm":"How to","Căn giữa":"Center","Căn phải":"Align right","Căn trái":"Align left","Hoàn tác":"Undo","Khoảng “":"Range “","Không lề":"No margin","Khổ giấy":"Paper size","Kiểu nét":"Line style","Lưu .txt":"Save .txt","Màu khác":"More colors","Mở phiên":"Open session","Nhân bản":"Duplicate","Nhân đôi":"Duplicate","Nét cong":"Curve","Nội dung":"Content","Phóng to":"Zoom in","Sao chép":"Copy","Xuất PDF":"Export PDF","Xuất ảnh":"Export images","chọn hết":"select all","dòng chữ":"text line","số trang":"page numbers","trang từ":"pages from","trên nét":"on stroke","tệp PDF:":"PDF files:","Đã trích":"Extracted","Đảo chọn":"Invert selection","điểm thứ":"point no.","đỉnh góc":"angle vertex","Bong bóng":"Balloon","Che trắng":"White-out","Chéo −45°":"Diagonal −45°","Chấm gạch":"Dash-dot","Chấm tròn":"Round dots","Các trang":"Pages","Dưới giữa":"Bottom center","Dưới phải":"Bottom right","Dưới trái":"Bottom left","JPG (nhẹ)":"JPG (small)","Không nền":"No fill","Khổ trang":"Page size","Lưu phiên":"Save session","Nội dung…":"Content…","Phiên mới":"New session","Thay ảnh…":"Replace image…","Trên giữa":"Top center","Trên phải":"Top right","Tùy chỉnh":"Custom","Tệp nguồn":"Source files","Xoay phải":"Rotate right","Xoay trái":"Rotate left","Xóa trang":"Delete page","chú thích":"annotations","giao điểm":"intersection","thiếu tệp":"missing file","· lưu lúc":"· saved at","Đang lưu…":"Saving…","Định dạng":"Format","điểm cuối":"endpoint","đoạn chữ,":"text runs,","Bắt đầu từ":"Start at","Chuyển đổi":"Convert","Chất lượng":"Quality","Chọn trang":"Select pages","Công cụ vẽ":"Drawing tools","Gỡ tệp này":"Remove this file","Hoàn thiện":"Finish","Hướng giấy":"Orientation","Không chân":"No footer","Kích thước":"Dimension","Theo đường":"Along line","Tiếng Việt":"English","Trang tính":"Sheet","Tùy chỉnh…":"Custom…","[chưa OCR]":"[no OCR yet]","hoàn tác ·":"undo ·","trung điểm":"midpoint","· Esc: hủy":"· Esc: cancel","· chậm hơn":"· slower","Đang dừng…":"Stopping…","Đang tách…":"Splitting…","Đã làm lại":"Redone","Đã xóa hẳn":"Permanently deleted","Đóng (Esc)":"Close (Esc)","Đường kính":"Diameter","Đảo thứ tự":"Reverse order","Đẩy ra sau":"Send backward","Độ dày nét":"Line width","— khớp khổ":"— fit paper","↶ Hoàn tác":"↶ Undo","Cỡ chữ (pt)":"Font size (pt)","Hoàn thiện:":"Finish:","Kiểu chuyển":"Conversion type","Lên một lớp":"Bring forward","Theo bản vẽ":"By drawing","Thu nhỏ (−)":"Zoom out (−)","Trang trước":"Previous page","Trang trắng":"Blank page","bấm để chốt":"click to confirm","Áp dụng cho":"Apply to","Ô chữ trống":"Empty text box","Đang xử lý…":"Processing…","Đã hoàn tác":"Undone","Đã sao chép":"Copied","Đã thay ảnh":"Image replaced","Đường thẳng":"Straight line",", chữ có sẵn":", existing text","Bàn làm việc":"Workbench","Có chú thích":"With annotations","Gộp vào cuối":"Append to end","JPG hoặc PNG":"JPG or PNG","Kiểu đầu chỉ":"Leader style","Lùi về trước":"Step back","Milimét (mm)":"Millimeters (mm)","Màu nền khác":"More background colors","Nét cong kín":"Closed curve","PDF sang ảnh":"PDF to Image","Phóng to (+)":"Zoom in (+)","Sửa nội dung":"Edit content","Sửa được chữ":"Editable text","Tất cả trang":"All pages","Xóa (Delete)":"Delete (Delete)","cạnh thứ hai":"second edge","hàng dữ liệu":"data rows","sửa được chữ":"editable text","trang tính ·":"sheets ·","· giữ vector":"· keep vectors","Đang mở tệp…":"Opening file…","Đang tạo tệp":"Creating file","Đã mở phiên:":"Session opened:","Độ phân giải":"Resolution","điểm thứ hai":"second point","Ảnh sang PDF":"Image to PDF","Ẩn hoặc hiện":"Hide or show","Chiều cao chữ":"Text height","Chuyển từ PDF":"Convert from PDF","Chỉ trang đầu":"First page only","Dấu thập phân":"Decimal mark","Hình chữ nhật":"Rectangle","Không mở được":"Cannot open","Lên trên cùng":"Bring to front","Lưu thiết lập":"Save settings","PNG (sắc nét)":"PNG (sharp)","Trang đã chọn":"Selected pages","Trích văn bản":"Extract text","Tên đối tượng":"Object name","Tạo & lưu PDF":"Create & save PDF","Tạo phiên mới":"Create new session","Vừa (tệp nhẹ)":"Medium (small file)","Xoay phải (R)":"Rotate right (R)","Xuống một lớp":"Send backward","Xóa đối tượng":"Delete object","cạnh thứ nhất":"first edge","sai định dạng":"invalid format","trang một tệp":"pages per file","Đang dựng ảnh":"Rendering images","Đang hiển thị":"Showing","Đang nén zip…":"Zipping…","Đang tạo PDF…":"Creating PDF…","Đánh số trang":"Page numbers","điểm thứ nhất":"first point","Bàn làm việc (":"Workbench (","Bỏ qua tệp này":"Skip this file","Chèn ô chữ (T)":"Insert text box (T)","Chọn điểm trên":"Pick a point on","Chữ kích thước":"Dimension text","Giữ nét vector":"Keep vector strokes","Kiểu phông chữ":"Font style","Nội dung ô chữ":"Text box content","PDF có lớp chữ":"PDF with text layer","Thêm PDF / ảnh":"Add PDF / images","Trang trắng A4":"Blank A4 page","Tất cả trang (":"All pages (","nhận dạng bảng":"table recognition","trang được OCR":"pages OCR'd","Đang dựng phần":"Rendering part","Đang xuất ảnh…":"Exporting images…","Đang đóng gói…":"Packaging…","Đã xóa chữ gốc":"Original text deleted","Đã xóa nét gốc":"Original stroke deleted","Đã xóa ảnh gốc":"Original image deleted","Đường gấp khúc":"Polyline","” không hợp lệ":"” is invalid","” nằm ngoài 1–":"” is outside 1–","300 dpi (chuẩn)":"300 dpi (standard)","Bảng tính trống":"Empty spreadsheet","Chuyển sang PDF":"Convert to PDF","Danh sách trang":"Page list","Dấu chấm (12.5)":"Dot (12.5)","Dấu phẩy (12,5)":"Comma (12,5)","Kiểu kích thước":"Dimension style","Mật khẩu mở tệp":"File open password","Rộng × cao (mm)":"Width × height (mm)","Trang đã chọn (":"Selected pages (","Tệp có mật khẩu":"Password-protected file","Xoay trang phải":"Rotate page right","Xoay trang trái":"Rotate page left","Xuống dưới cùng":"Send to back","dpi kèm lớp chữ":"dpi with text layer","trên đường tròn":"on circle","Đang dựng trang":"Rendering page","220 dpi (in đẹp)":"220 dpi (good print)","72 dpi (rất nhẹ)":"72 dpi (very small)",": đang dựng ảnh…":": rendering images…",": đang nhận dạng":": recognizing","Bút vẽ tự do (P)":"Freehand pen (P)","Chưa có tệp nào.":"No files yet.","Chọn một tệp PDF":"Choose a PDF file","Chữ đậm (Ctrl+B)":"Bold (Ctrl+B)","Hoặc dán mã HTML":"Or paste HTML code","Làm lại (Ctrl+Y)":"Redo (Ctrl+Y)","Phiên hiện tại (":"Current session (","Thiết lập bản vẽ":"Drawing setup","Trang tạo từ ảnh":"Page created from image","lên bàn làm việc":"to the workbench","Đang chuyển đổi…":"Converting…","Đang chép trang…":"Copying pages…","Ảnh gốc (đã sửa)":"Original image (edited)","ảnh chèn bị hỏng":"broken inserted image","Hoàn tác (Ctrl+Z)":"Undo (Ctrl+Z)","Khóa hoặc mở khóa":"Lock or unlock","Mỗi trang một tệp":"One file per page","Mở phiên làm việc":"Open work session","Nhân bản (Ctrl+D)":"Duplicate (Ctrl+D)","Theo khoảng trang":"By page range","Tách & lưu (.zip)":"Split & save (.zip)","Xem toàn màn hình":"Full screen view","Đưa lên trên cùng":"Bring to front","Độ phân giải quét":"Scan resolution","110 dpi (màn hình)":"110 dpi (screen)","Bấm đúp để đổi tên":"Double-click to rename","Bắt đầu phiên mới?":"Start a new session?","Chú thích vẽ thêm:":"Added annotations:","Không lưu được tệp":"Could not save the file","Không lưu, tạo mới":"Don't save, create new","Rất nét (tệp nặng)":"Very sharp (large file)","Số trong bong bóng":"Number in balloon","Thông tin tài liệu":"Document info","Tỉ lệ không hợp lệ":"Invalid scale","[không có lớp chữ]":"[no text layer]","Đang chuẩn bị OCR…":"Preparing OCR…","Đang đọc tệp Word…":"Reading Word file…","ảnh liên kết ngoài":"externally linked image","150 dpi (in thường)":"150 dpi (normal print)","Bấm để chọn trang ·":"Click to select page ·","Bằng kích thước ảnh":"Same as image size","Chọn tệp cần chuyển":"Choose files to convert","Danh sách đối tượng":"Object list","Không đọc được HTML":"Cannot read HTML","Mỗi trang một sheet":"One sheet per page","Ngôn ngữ trên trang":"Language on page","Số chữ số thập phân":"Number of decimals","Thay phiên hiện tại":"Replace current session","Xoay trang phải (R)":"Rotate page right (R)","Xoay trái (Shift+R)":"Rotate left (Shift+R)","[không nhận ra chữ]":"[no text recognized]","mỗi trang một slide":"one slide per page","Đang trích văn bản…":"Extracting text…","Đang đọc bảng tính…":"Reading spreadsheet…","Đưa xuống dưới cùng":"Send to back","(bật OCR để lấy chữ)":"(enable OCR to get text)","(trang không có chữ)":"(page has no text)","Chọn kiểu chuyển đổi":"Choose a conversion type","Chữ nghiêng (Ctrl+I)":"Italic (Ctrl+I)","Di chuột để đặt chữ,":"Move the mouse to place text,","Không chèn được ảnh:":"Could not insert image:","Không thay được ảnh:":"Could not replace image:","Lên một lớp (Ctrl+])":"Bring forward (Ctrl+])","Mở trên bàn làm việc":"Open on workbench","Sắp xếp theo tên tệp":"Sort by file name","Trang trước (PageUp)":"Previous page (PageUp)","Trang đang được chọn":"Currently selected page","Đối tượng trên trang":"Objects on page","đang đọc nét vector…":"reading vector strokes…","đường tròn hoặc cung":"circle or arc","Bỏ qua một chú thích:":"Skipped an annotation:","Chưa thiết lập bản vẽ":"Drawing not set up","Di chuột để đặt cung,":"Move the mouse to place the arc,","Lưu PDF tìm kiếm được":"Save searchable PDF","Lưu phiên rồi tạo mới":"Save session, then create new","Tỉ lệ (bản vẽ : thực)":"Scale (drawing : real)","gốc dưới vùng sửa/che":"original under edited/whited-out areas","tệp .html hoặc dán mã":".html file or paste code","Đã sao chép đối tượng":"Object copied","A4 (tự xoay ngang/dọc)":"A4 (auto landscape/portrait)","Không dựng được trang:":"Could not render page:","Sai mật khẩu, thử lại.":"Wrong password, try again.","Xem và chú thích trang":"View and annotate page","Xuống một lớp (Ctrl+[)":"Send backward (Ctrl+[)","Xóa đối tượng (Delete)":"Delete object (Delete)","chuẩn lưu trữ PDF/A-2b":"PDF/A-2b archival standard","cách nhau bởi dấu phẩy":"separated by commas","Đang nạp bộ nhận dạng…":"Loading recognizer…","Không còn gì để làm lại":"Nothing to redo","Vừa màn hình / 100% (0)":"Fit screen / 100% (0)","không tải được thư viện":"could not load library","Đang mở phiên làm việc…":"Opening work session…","Đang đóng gói tệp Word…":"Packaging Word file…","Đánh dấu chọn trang này":"Mark this page as selected","để tìm kiếm và bôi đen.":"to search and select.","Ẩn/hiện danh sách trang":"Show/hide page list","(chọn kèm cùng tệp HTML)":"(select together with the HTML file)",", gói trong một tệp .zip":", packed in one .zip file","Gộp tất cả vào một sheet":"Merge all into one sheet","Không còn gì để hoàn tác":"Nothing to undo","Nhập kích thước khổ giấy":"Enter paper size","Thả PDF hoặc ảnh vào đây":"Drop PDFs or images here","tài nguyên trên Internet":"Internet resources","Đang lưu phiên làm việc…":"Saving work session…","Đang tạo PDF có lớp chữ…":"Creating PDF with text layer…","Đang đọc nội dung trang…":"Reading page content…","Đang đọc tệp PowerPoint…":"Reading PowerPoint file…","Đã lưu thiết lập bản vẽ:":"Drawing setup saved:","Độ rộng so với cạnh ngắn":"Width relative to short edge","Chọn ít nhất một ngôn ngữ":"Select at least one language","Chữ gốc (đã xóa nội dung)":"Original text (content deleted)","Không dựng được slide nào":"No slides could be rendered","Theo kích thước trang PDF":"Same as PDF page size","Tệp không đúng loại. Cần:":"Wrong file type. Needed:","Tự chọn theo độ rộng bảng":"Auto by table width","Xem toàn màn hình (Enter)":"Full screen view (Enter)","Xoay trang trái (Shift+R)":"Rotate page left (Shift+R)","Đang đóng gói PowerPoint…":"Packaging PowerPoint…","Đã tạo phiên làm việc mới":"New work session created","Đóng dấu chìm (watermark)":"Watermark","Dán vào trang này (Ctrl+V)":"Paste on this page (Ctrl+V)","Không có ảnh nào dùng được":"No usable images","Đang nạp bộ nhận dạng chữ…":"Loading text recognizer…","Đã thêm trang trắng ở cuối":"Blank page added at the end","Bỏ số 0 thừa (12.50 → 12.5)":"Drop trailing zeros (12.50 → 12.5)","Chọn, di chuyển, đổi cỡ (V)":"Select, move, resize (V)","Giữ nguyên hình (ảnh trang)":"Keep appearance (page images)","Tệp không phải .pptx hợp lệ":"Not a valid .pptx file","Ẩn/hiện danh sách đối tượng":"Show/hide object list","Bấm vào chi tiết cần chỉ rồi":"Click the detail to point at, then","Không có trang nào để chuyển":"No pages to convert","Không khởi động được bộ OCR:":"Could not start OCR:","Không xóa được nội dung gốc:":"Could not remove original content:","Lên trên cùng (Ctrl+Shift+])":"Bring to front (Ctrl+Shift+])","Áp dụng cho tất cả các trang":"Apply to all pages","An toàn (ảnh trang + lớp chữ)":"Safe (page image + text layer)","Khổ trang bằng kích thước ảnh":"Page size = image size","Bỏ qua trang đã có sẵn lớp chữ":"Skip pages that already have a text layer","Chọn một kiểu chuyển đổi trước":"Choose a conversion type first","Xuống dưới cùng (Ctrl+Shift+[)":"Send to back (Ctrl+Shift+[)","Đang đọc chữ và ảnh của trang…":"Reading text and images on page…","· giữ Shift: đo theo đường xiên":"· hold Shift: measure along slant","<h1>Tiêu đề</h1><p>Nội dung…</p>":"<h1>Title</h1><p>Content…</p>","HTML (chọn kèm ảnh, CSS đi cùng)":"HTML (select with images, CSS)","Hình elip (giữ Shift: hình tròn)":"Ellipse (hold Shift: circle)","Không đọc được nội dung tệp Word":"Cannot read Word file content","Mũi tên (giữ Shift: bắt góc 45°)":"Arrow (hold Shift: snap 45°)","Thay ảnh khác, giữ nguyên vị trí":"Replace image, keep position","để đặt bong bóng · số tiếp theo:":"to place the balloon · next number:","Che trắng: phủ trắng một vùng (W)":"White-out: cover an area with white (W)","Chèn ảnh từ máy (hoặc dán Ctrl+V)":"Insert image from computer (or paste Ctrl+V)","Di chuột để đặt đường kích thước,":"Move the mouse to place the dimension line,","Không có dòng chữ nào trong khung":"No text lines in the box","trang đã có kết quả (sẽ dùng lại)":"pages already have results (will reuse)","Đã xóa trang · Ctrl+Z để hoàn tác":"Page deleted · Ctrl+Z to undo","Hiện (đang ẩn, sẽ không in ra PDF)":"Show (hidden, will not print to PDF)","Đặt vào khổ A4 (tự xoay ngang/dọc)":"Fit to A4 (auto landscape/portrait)","Khoảng trang (theo thứ tự trên bàn)":"Page range (in workbench order)","Nhập khoảng trang, ví dụ 1-3, 5, 8-":"Enter page range, e.g. 1-3, 5, 8-","Chép chữ của trang vào ghi chú slide":"Copy page text to slide notes","Đường thẳng (giữ Shift: bắt góc 45°)":"Line (hold Shift: snap 45°)","ảnh hỏng hoặc định dạng không hỗ trợ":"broken image or unsupported format","Hình chữ nhật (giữ Shift: hình vuông)":"Rectangle (hold Shift: square)","Tự nhận dạng chữ (OCR) cho trang scan":"Auto text recognition (OCR) for scanned pages","tệp nguồn, theo đúng thứ tự trên bàn.":"source files, in workbench order.","Nén mạnh (chuyển trang thành ảnh JPEG)":"Strong compression (pages to JPEG images)","trang dùng chữ có sẵn hoặc kết quả cũ)":"pages use existing text or earlier results)","Đổi chữ số thành số (1.234,5 → 1234.5)":"Convert numeric text to numbers (1.234,5 → 1234.5)","Đã chèn trang trắng sau trang chọn cuối":"Blank page inserted after the last selected page","Bút bôi vàng (H) · giữ Shift để kẻ thẳng":"Highlighter (H) · hold Shift for a straight line","Các đối tượng, trên cùng là lớp nằm trên":"Objects, topmost is the top layer","Mở phiên làm việc đã lưu (.plt) · Ctrl+O":"Open a saved work session (.plt) · Ctrl+O","Sao chép để dán sang trang khác (Ctrl+C)":"Copy to paste on another page (Ctrl+C)","Đã dừng. Các trang đã xong được giữ lại.":"Stopped. Finished pages were kept.","Thiết lập bản vẽ: khổ giấy, tỉ lệ, đơn vị":"Drawing setup: paper size, scale, units","biểu đồ/hình vẽ chưa hỗ trợ nên bị bỏ qua":"charts/drawings not supported yet, skipped","(kiểm tra thư mục lib nằm cạnh index.html)":"(check the lib folder next to index.html)","Bàn làm việc đang trống, chưa có gì để lưu":"Workbench is empty, nothing to save","trang (giữ dạng vector, chữ vẫn chọn được)":"pages (vector kept, text still selectable)","Đã bôi đen toàn bộ, bấm Ctrl+C để sao chép":"Everything selected, press Ctrl+C to copy",". Kích thước đo = độ dài trên giấy × tỉ lệ.":". Measured size = length on paper × scale.","Chọn một mục bên trái, rồi kéo thả tệp vào.":"Pick an item on the left, then drop files in.","Không tìm thấy chữ. Có thể đây là bản scan.":"No text found. This may be a scan.","ảnh định dạng EMF/WMF hoặc liên kết ngoài (":"EMF/WMF images or external links (","3 điểm thẳng hàng, không tạo được đường tròn":"3 collinear points, cannot make a circle","Khóa (không chọn, không kéo được trên trang)":"Lock (cannot select or drag on page)","Tệp được mã hóa: trang sẽ xuất dưới dạng ảnh":"Encrypted file: pages will be exported as images","· trang không có nét vector, chọn điểm tự do":"· page has no vector strokes, pick points freely","<> là giá trị đo. Ví dụ: 2x <>  hoặc  <> ±0.1":"<> is the measured value. E.g.: 2x <>  or  <> ±0.1","Kèm lớp chữ ẩn (tìm kiếm, bôi đen, copy được)":"With hidden text layer (searchable, selectable, copyable)","trang không có chữ nên được đặt dưới dạng ảnh":"pages have no text so were placed as images","Bắt đầu phiên làm việc mới (bàn làm việc trống)":"Start a new work session (empty workbench)","trang. Bàn làm việc hiện đang có tài liệu khác.":"pages. The workbench currently has other documents.","Đã sao chép. Mở trang khác rồi bấm Dán (Ctrl+V)":"Copied. Open another page and press Paste (Ctrl+V)","Kết quả nhận dạng sẽ hiện ở đây, từng trang một.":"Recognition results will appear here, page by page.","trang) sẽ được dọn trống. Phiên này đã được lưu.":"pages) will be cleared. This session has been saved.","” không phải tệp phiên làm việc của MrT PDFlover":"” is not a MrT PDFlover work session file","Chọn tệp .html (có thể chọn kèm ảnh, CSS đi cùng)":"Choose an .html file (you can include images, CSS)","Đã xóa nét gốc · xóa mục này ở danh sách để khôi phục":"Original stroke deleted · delete this item in the list to restore","(nét vẽ sẽ sáng cam), hoặc chọn 3 điểm trên đường tròn":"(strokes light up orange), or pick 3 points on the circle","Xóa hẳn chữ/ảnh gốc nằm dưới vùng đã sửa hoặc che trắng":"Permanently remove original text/images under edited or whited-out areas","gốc · xóa tiếp mục này ở danh sách để khôi phục bản gốc":"original · delete this item in the list to restore the original","Lưu phiên làm việc thành tệp .plt để mở lại sau · Ctrl+S":"Save the work session as a .plt file to reopen later · Ctrl+S","Đối tượng đang khóa. Mở khóa ở danh sách bên phải để xóa":"Object is locked. Unlock it in the list on the right to delete","để bạn thử. Khi bạn thêm tệp của mình, tệp mẫu sẽ tự gỡ.":"for you to try. When you add your own files, the samples are removed.","đoạn chỉ được che phủ (phông chữ thiếu thông tin độ rộng)":"runs were only covered (font lacks width info)",". Nếu cần nộp hồ sơ chính thức, có thể kiểm lại bằng veraPDF.":". For official submissions, verify with veraPDF.","Góc: chọn đỉnh, điểm trên cạnh 1, điểm trên cạnh 2 rồi đặt cung":"Angle: pick the vertex, a point on edge 1, a point on edge 2, then place the arc","Bán kính: bấm vào đường tròn/cung (hoặc chọn 3 điểm) rồi đặt chữ":"Radius: click a circle/arc (or pick 3 points), then place the text","Các thiết lập này áp dụng cho mọi tệp PDF xuất ra (cả khi tách).":"These settings apply to every exported PDF (including splits).","Đường kính: bấm vào đường tròn/cung (hoặc chọn 3 điểm) rồi đặt chữ":"Diameter: click a circle/arc (or pick 3 points), then place the text","Mỗi trang thành một ảnh. Nhiều trang sẽ được gói trong một tệp .zip.":"Each page becomes an image. Multiple pages are packed in one .zip file.","Nhận dạng ngay trên máy, không cần mạng, tệp không rời máy. Tạo được":"Recognition runs on this computer, no network needed, files never leave it. Can create","Chỉ nhận tệp PDF, ảnh (JPG, PNG, WebP, GIF…) hoặc phiên làm việc .plt":"Only PDF, images (JPG, PNG, WebP, GIF…) or .plt work sessions are accepted","Chưa có đối tượng nào. Chọn một công cụ ở thanh trên rồi vẽ lên trang.":"No objects yet. Pick a tool on the top bar and draw on the page.","PDF giữ nguyên hình trang, thêm lớp chữ vô hình để tìm kiếm và bôi đen":"PDF keeps the page appearance, adds an invisible text layer for search and selection","Chạy hoàn toàn trên máy này, không cần mạng. Tệp không rời khỏi máy bạn.":"Runs entirely on this computer, no network needed. Files never leave your machine.","Giảm dung lượng đáng kể với bản scan. Văn bản sẽ không còn chọn/tìm được.":"Greatly reduces size for scans. Text will no longer be selectable/searchable.","Bong bóng đánh số (B): bấm vào chi tiết rồi kéo ra để đặt. Số tự tăng từ 1":"Numbered balloon (B): click the detail, then drag out to place. Numbers start at 1","(đường, khung, hình tròn…) của PDF để sửa · kéo khung để gộp nhiều dòng chữ":"(lines, frames, circles…) of the PDF to edit · drag a box to merge several text lines","Sau khi mở, bản xuất ra sẽ không còn mật khẩu (trang được chuyển thành ảnh).":"After opening, the export will have no password (pages are converted to images).","Văn bản trích ra sẽ hiện ở đây. Bản scan (ảnh) không có lớp chữ nên sẽ trống.":"Extracted text will appear here. Scans (images) have no text layer, so it will be empty.","+bấm chọn một dải · kéo thả để đổi vị trí (kéo trang đã chọn sẽ kéo cả nhóm) ·":"+click selects a range · drag to reorder (dragging a selected page moves the whole group) ·","Mọi chuyển đổi chạy ngay trên máy này, không cần mạng và không gửi tệp đi đâu.":"All conversions run on this computer, no network needed, files are not sent anywhere.","Hình trang được giữ nguyên, chữ vẫn tìm kiếm được. Tệp có thể nặng hơn bản gốc.":"Page appearance is kept, text stays searchable. The file may be larger than the original.","Trang này không có chữ/ảnh dạng PDF để sửa (bản scan: dùng OCR, hoặc Che trắng + Ô chữ)":"This page has no PDF text/images to edit (scan: use OCR, or White-out + Text box)","trang) có thay đổi chưa lưu. Nếu không lưu, các thay đổi, chú thích và kích thước sẽ mất.":"pages) have unsaved changes. If not saved, changes, annotations and dimensions will be lost.","ảnh không hiển thị được (thường là định dạng EMF/WMF của Office; hãy chèn lại dưới dạng PNG/JPG)":"images could not be displayed (usually Office EMF/WMF; re-insert as PNG/JPG)","Ghép nhiều ảnh thành một tệp PDF, mỗi ảnh một trang. Ảnh chụp điện thoại được tự xoay đúng chiều.":"Combine many images into one PDF, one image per page. Phone photos are auto-rotated upright.","Bắt điểm theo nét vector của PDF: điểm cuối, trung điểm, tâm, giao điểm, trên nét. Giữ Alt để tạm tắt":"Snap to the PDF's vector strokes: endpoint, midpoint, center, intersection, on stroke. Hold Alt to disable temporarily","Trang này không có chữ hoặc ảnh dạng PDF để sửa (có thể là bản scan: dùng OCR hoặc Che trắng + Ô chữ)":"This page has no PDF text or images to edit (may be a scan: use OCR or White-out + Text box)","Giữ nguyên nội dung gốc. Chỉ đạt chuẩn nếu PDF gốc đã nhúng đủ font; nếu không chắc, dùng chế độ an toàn.":"Keeps the original content. Compliant only if the original PDF embeds all fonts; if unsure, use safe mode.","Kích thước dài (D): chọn 2 điểm rồi đặt đường kích thước. Tự nhận ngang/dọc, giữ Shift để đo theo đường xiên":"Linear dimension (D): pick 2 points, then place the dimension line. Auto horizontal/vertical, hold Shift to measure along a slant","Mỗi trang PDF thành một slide, khung slide theo tỉ lệ trang. Chữ của trang được chép vào phần ghi chú (notes).":"Each PDF page becomes a slide, slide frame matches the page ratio. Page text is copied into the notes.","Trên cùng danh sách = lớp nằm trên. Kéo thả để đổi thứ tự, bấm đúp tên để đổi tên. Đối tượng ẩn sẽ không in ra PDF.":"Top of the list = top layer. Drag to reorder, double-click a name to rename. Hidden objects are not printed to PDF.","Gộp nhiều tệp, kéo thả để sắp xếp trang, xoay, xóa, tách, đánh số trang, đóng dấu chìm, nén, xuất ảnh hoặc trích văn bản.":"Merge files, drag to reorder pages, rotate, delete, split, number pages, watermark, compress, export images or extract text.","Bảng tính được chia trang theo hàng, không cắt ngang một dòng. Giữ số liệu và định dạng số; màu ô và biểu đồ không được giữ.":"The spreadsheet is paginated by rows without cutting a row. Values and number formats are kept; cell colors and charts are not.","Nhận dạng cột theo khoảng trắng giữa các chữ, mỗi dòng chữ thành một hàng. Hợp nhất với bảng kê, báo giá, BOM xuất từ phần mềm.":"Columns are detected from gaps between words, each text line becomes a row. Suited to lists, quotes and BOMs exported from software.","Mỗi slide thành một trang PDF đúng tỉ lệ khung. Hiệu ứng chuyển động không được giữ. Tệp .ppt đời cũ cần lưu lại thành .pptx trước.":"Each slide becomes a PDF page at the slide ratio. Animations are not kept. Old .ppt files must be re-saved as .pptx first.","Sửa nội dung có sẵn của PDF (E): bấm vào dòng chữ để sửa chữ, bấm vào ảnh để di chuyển/thay/xóa. Kéo khung để gộp nhiều dòng thành một đoạn":"Edit existing PDF content (E): click a text line to edit text, click an image to move/replace/delete. Drag a box to merge several lines into one paragraph","Dựng lại trang Word như khi mở trên máy, rồi xuất PDF. Chữ hiển thị bằng font có trên máy này. Tệp .doc đời cũ cần lưu lại thành .docx trước.":"Re-renders the Word pages as on the computer, then exports PDF. Text uses fonts available on this computer. Old .doc files must be re-saved as .docx first.","Chế độ “sửa được” dựng lại đoạn văn, tiêu đề, chữ đậm và căn giữa để bạn sửa trong Word. Chế độ “giữ nguyên hình” đặt mỗi trang thành một ảnh.":"“Editable” mode rebuilds paragraphs, headings, bold and centering for editing in Word. “Keep appearance” mode turns each page into an image.","Lăn chuột: phóng to/thu nhỏ · Kéo vùng trống hoặc giữ Space: di chuyển · Bấm đúp ô chữ để sửa · V T P H W: đổi công cụ · Ctrl+Z / Ctrl+Y · Esc: thoát":"Mouse wheel: zoom · Drag empty area or hold Space: pan · Double-click a text box to edit · V T P H W: switch tool · Ctrl+Z / Ctrl+Y · Esc: exit","Tạo tệp theo chuẩn lưu trữ PDF/A-2b: nhúng hồ sơ màu sRGB, siêu dữ liệu XMP và font. Chế độ “an toàn” dựng lại trang thành ảnh kèm lớp chữ ẩn nên luôn đạt chuẩn.":"Creates a PDF/A-2b archival file: embeds the sRGB color profile, XMP metadata and fonts. “Safe” mode re-renders pages as images with a hidden text layer, so it always complies.","Chuyển trang HTML thành PDF khổ A4. Nếu trang dùng ảnh hoặc CSS ở tệp riêng (ví dụ logo.png, style.css), hãy chọn hoặc kéo thả chúng cùng lúc với tệp HTML. Script trong trang không được chạy, tài nguyên trên Internet bị bỏ qua.":"Converts an HTML page to A4 PDF. If the page uses images or CSS in separate files (e.g. logo.png, style.css), select or drop them together with the HTML file. Scripts in the page are not run; Internet resources are ignored.","Trang":"Page","trang":"pages","Xoay":"Rotate","Ngang":"Landscape","ngang":"landscape","tr.":"p.","Elip":"Ellipse","Excel sang PDF":"Excel to PDF","HTML sang PDF":"HTML to PDF","PDF sang Excel":"PDF to Excel","PDF sang PDF/A":"PDF to PDF/A","PDF sang PowerPoint":"PDF to PowerPoint","PDF sang Word":"PDF to Word","PowerPoint sang PDF":"PowerPoint to PDF","Word sang PDF":"Word to PDF","Trang 1":"Page 1","Trang 1/12":"Page 1/12","xoay ·":"rotate ·","Trang tính “":"Sheet “","Ngôn ngữ":"Language","giây":"s","Trang sau (PageDown)":"Next page (PageDown)","Trang sau":"Next page","Chọn ngôn ngữ giao diện":"Choose interface language","Thả các tệp":"Drop","Thả tệp":"Drop","Gỡ":"Remove","Dùng các trang trên bàn làm việc":"Use the workbench pages"};
+const I18N_EN = {"Thêm trang":"Add page","Trang PDF":"PDF page","xoay":"rotate","Cỡ":"Size","Lề":"Margin","Số":"No.","Ẩn":"Hide","Bút":"Pen","Chữ":"Text","Dán":"Paste","Dọc":"Portrait","Góc":"Angle","Hủy":"Cancel","Màu":"Color","Mẫu":"Template","Nét":"Stroke","Nền":"Fill","Tạo":"Create","Vừa":"Fit","Trung bình":"Medium","Xóa":"Delete","chữ":"text","dọc":"portrait","gốc":"original","nén":"compress","tâm":"center","Đậm":"Bold","Ảnh":"Image","ảnh":"image","Bắt:":"Snap:","Chấm":"Dotted","Chọn":"Select","Dừng":"Stop","Khóa":"Lock","Kiểu":"Style","Liền":"Solid","Lỗi:":"Error:","Tách":"Split","hoặc":"or","Đóng":"Close","” có":"” has","Không":"None","Phông":"Font","Số lẻ":"Decimals","không":"no","ký tự":"characters","trắng":"white","xóa ·":"delete ·","Ô chữ":"Text box","Đường":"Line","A4 dọc":"A4 portrait","Bỏ qua":"Skip","Bỏ tệp":"Remove file","Bố trí":"Layout","Chế độ":"Mode","Chủ đề":"Subject","Cỡ chữ":"Font size","Cứ mỗi":"Every","Lưu ý:":"Note:","Ra ảnh":"To image","Tất cả":"All","Vị trí":"Position","bỏ qua":"skip","kéo ra":"drag out","nét vẽ":"strokes","Đã lưu":"Saved","Đã tạo":"Created","Đã xóa":"Deleted","Đã đưa":"Moved","Đơn vị":"Unit","Độ nét":"Sharpness","Độ đậm":"Weight","Bấm vào":"Click","Bỏ chọn":"Deselect","Có chân":"With footer","Công cụ":"Tools","Làm lại":"Redo","Lưu lại":"Save","Mũi tên":"Arrow","Mở khóa":"Unlock","Nghiêng":"Italic","Nét bút":"Pen stroke","Nét đứt":"Dashed","Rất nét":"Very sharp","Sẽ xuất":"Will export","Thu nhỏ":"Zoom out","Tiêu đề":"Title","Tác giả":"Author","Tên tệp":"File name","Từ khóa":"Keywords","Văn bản":"Text","tệp mẫu":"sample files","vào đây":"here","Đa giác":"Polygon","Đang mở":"Opening","Đầu chỉ":"Leader end","Bán kính":"Radius","Bôi vàng":"Highlight","Bắt điểm":"Snap","Chéo 45°":"Diagonal 45°","Chạy OCR":"Run OCR","Chọn hết":"Select all","Chọn tệp":"Choose file","Chữ gốc:":"Original text:","Chữ nhật":"Rectangle","Cách làm":"How to","Căn giữa":"Center","Căn phải":"Align right","Căn trái":"Align left","Hoàn tác":"Undo","Khoảng “":"Range “","Không lề":"No margin","Khổ giấy":"Paper size","Kiểu nét":"Line style","Lưu .txt":"Save .txt","Màu khác":"More colors","Mở phiên":"Open session","Nhân bản":"Duplicate","Nhân đôi":"Duplicate","Nét cong":"Curve","Nội dung":"Content","Phóng to":"Zoom in","Sao chép":"Copy","Xuất PDF":"Export PDF","Xuất ảnh":"Export images","chọn hết":"select all","dòng chữ":"text line","số trang":"page numbers","trang từ":"pages from","trên nét":"on stroke","tệp PDF:":"PDF files:","Đã trích":"Extracted","Đảo chọn":"Invert selection","điểm thứ":"point no.","đỉnh góc":"angle vertex","Bong bóng":"Balloon","Che trắng":"White-out","Chéo −45°":"Diagonal −45°","Chấm gạch":"Dash-dot","Chấm tròn":"Round dots","Các trang":"Pages","Dưới giữa":"Bottom center","Dưới phải":"Bottom right","Dưới trái":"Bottom left","JPG (nhẹ)":"JPG (small)","Không nền":"No fill","Khổ trang":"Page size","Lưu phiên":"Save session","Nội dung…":"Content…","Phiên mới":"New session","Thay ảnh…":"Replace image…","Trên giữa":"Top center","Trên phải":"Top right","Tùy chỉnh":"Custom","Tệp nguồn":"Source files","Xoay phải":"Rotate right","Xoay trái":"Rotate left","Xóa trang":"Delete pages","chú thích":"annotations","giao điểm":"intersection","thiếu tệp":"missing file","· lưu lúc":"· saved at","Đang lưu…":"Saving…","Định dạng":"Format","điểm cuối":"endpoint","đoạn chữ,":"text runs,","Bắt đầu từ":"Start at","Chuyển đổi":"Convert","Chất lượng":"Quality","Chọn trang":"Select pages","Công cụ vẽ":"Drawing tools","Gỡ tệp này":"Remove this file","Hoàn thiện":"Finish","Hướng giấy":"Orientation","Không chân":"No footer","Kích thước":"Dimension","Theo đường":"Along line","Tiếng Việt":"English","Trang tính":"Sheet","Tùy chỉnh…":"Custom…","[chưa OCR]":"[no OCR yet]","hoàn tác ·":"undo ·","trung điểm":"midpoint","· Esc: hủy":"· Esc: cancel","· chậm hơn":"· slower","Đang dừng…":"Stopping…","Đang tách…":"Splitting…","Đã làm lại":"Redid","Đã xóa hẳn":"Permanently deleted","Đóng (Esc)":"Close (Esc)","Đường kính":"Diameter","Đảo thứ tự":"Reverse order","Đẩy ra sau":"Send backward","Độ dày nét":"Line width","— khớp khổ":"— fit paper","↶ Hoàn tác":"↶ Undo","Cỡ chữ (pt)":"Font size (pt)","Hoàn thiện:":"Finish:","Kiểu chuyển":"Conversion type","Lên một lớp":"Bring forward","Theo bản vẽ":"By drawing","Thu nhỏ (−)":"Zoom out (−)","Trang trước":"Previous page","Trang trắng":"Blank page","bấm để chốt":"click to confirm","Áp dụng cho":"Apply to","Ô chữ trống":"Empty text box","Đang xử lý…":"Processing…","Đã hoàn tác":"Undid","Đã sao chép":"Copied","Đã thay ảnh":"Image replaced","Đường thẳng":"Straight line",", chữ có sẵn":", existing text","Bàn làm việc":"Workbench","Có chú thích":"With annotations","Gộp vào cuối":"Append to end","JPG hoặc PNG":"JPG or PNG","Kiểu đầu chỉ":"Leader style","Lùi về trước":"Step back","Milimét (mm)":"Millimeters (mm)","Màu nền khác":"More background colors","Nét cong kín":"Closed curve","PDF sang ảnh":"PDF to Image","Phóng to (+)":"Zoom in (+)","Sửa nội dung":"Edit content","Sửa được chữ":"Editable text","Tất cả trang":"All pages","Xóa (Delete)":"Delete (Delete)","cạnh thứ hai":"second edge","hàng dữ liệu":"data rows","sửa được chữ":"editable text","trang tính ·":"sheets ·","· giữ vector":"· keep vectors","Đang mở tệp…":"Opening file…","Đang tạo tệp":"Creating file","Đã mở phiên:":"Session opened:","Độ phân giải":"Resolution","điểm thứ hai":"second point","Ảnh sang PDF":"Image to PDF","Ẩn hoặc hiện":"Hide or show","Chiều cao chữ":"Text height","Chuyển từ PDF":"Convert from PDF","Chỉ trang đầu":"First page only","Dấu thập phân":"Decimal mark","Hình chữ nhật":"Rectangle","Không mở được":"Cannot open","Lên trên cùng":"Bring to front","Lưu thiết lập":"Save settings","PNG (sắc nét)":"PNG (sharp)","Trang đã chọn":"Selected pages","Trích văn bản":"Extract text","Tên đối tượng":"Object name","Tạo & lưu PDF":"Create & save PDF","Tạo phiên mới":"Create new session","Vừa (tệp nhẹ)":"Medium (small file)","Xoay phải (R)":"Rotate right (R)","Xuống một lớp":"Send backward","Xóa đối tượng":"Delete object","cạnh thứ nhất":"first edge","sai định dạng":"invalid format","trang một tệp":"pages per file","Đang dựng ảnh":"Rendering images","Đang hiển thị":"Showing","Đang nén zip…":"Zipping…","Đang tạo PDF…":"Creating PDF…","Đánh số trang":"Page numbers","điểm thứ nhất":"first point","Bàn làm việc (":"Workbench (","Bỏ qua tệp này":"Skip this file","Chèn ô chữ (T)":"Insert text box (T)","Chọn điểm trên":"Pick a point on","Chữ kích thước":"Dimension text","Giữ nét vector":"Keep vector strokes","Kiểu phông chữ":"Font style","Nội dung ô chữ":"Text box content","PDF có lớp chữ":"PDF with text layer","Thêm PDF / ảnh":"Add PDF / images","Trang trắng A4":"Blank A4 page","Tất cả trang (":"All pages (","nhận dạng bảng":"table recognition","trang được OCR":"pages OCR'd","Đang dựng phần":"Rendering part","Đang xuất ảnh…":"Exporting images…","Đang đóng gói…":"Packaging…","Đã xóa chữ gốc":"Original text deleted","Đã xóa nét gốc":"Original stroke deleted","Đã xóa ảnh gốc":"Original image deleted","Đường gấp khúc":"Polyline","” không hợp lệ":"” is invalid","” nằm ngoài 1–":"” is outside 1–","300 dpi (chuẩn)":"300 dpi (standard)","Bảng tính trống":"Empty spreadsheet","Chuyển sang PDF":"Convert to PDF","Danh sách trang":"Page list","Dấu chấm (12.5)":"Dot (12.5)","Dấu phẩy (12,5)":"Comma (12,5)","Kiểu kích thước":"Dimension style","Mật khẩu mở tệp":"File open password","Rộng × cao (mm)":"Width × height (mm)","Trang đã chọn (":"Selected pages (","Tệp có mật khẩu":"Password-protected file","Xoay trang phải":"Rotate page right","Xoay trang trái":"Rotate page left","Xuống dưới cùng":"Send to back","dpi kèm lớp chữ":"dpi with text layer","trên đường tròn":"on circle","Đang dựng trang":"Rendering page","220 dpi (in đẹp)":"220 dpi (good print)","72 dpi (rất nhẹ)":"72 dpi (very small)",": đang dựng ảnh…":": rendering images…",": đang nhận dạng":": recognizing","Bút vẽ tự do (P)":"Freehand pen (P)","Chưa có tệp nào.":"No files yet.","Chọn một tệp PDF":"Choose a PDF file","Chữ đậm (Ctrl+B)":"Bold (Ctrl+B)","Hoặc dán mã HTML":"Or paste HTML code","Làm lại (Ctrl+Y)":"Redo (Ctrl+Y)","Phiên hiện tại (":"Current session (","Thiết lập bản vẽ":"Drawing setup","Trang tạo từ ảnh":"Page created from image","lên bàn làm việc":"to the workbench","Đang chuyển đổi…":"Converting…","Đang chép trang…":"Copying pages…","Ảnh gốc (đã sửa)":"Original image (edited)","ảnh chèn bị hỏng":"broken inserted image","Hoàn tác (Ctrl+Z)":"Undo (Ctrl+Z)","Khóa hoặc mở khóa":"Lock or unlock","Mỗi trang một tệp":"One file per page","Mở phiên làm việc":"Open work session","Nhân bản (Ctrl+D)":"Duplicate (Ctrl+D)","Theo khoảng trang":"By page range","Tách & lưu (.zip)":"Split & save (.zip)","Xem toàn màn hình":"Full screen view","Đưa lên trên cùng":"Bring to front","Độ phân giải quét":"Scan resolution","110 dpi (màn hình)":"110 dpi (screen)","Bấm đúp để đổi tên":"Double-click to rename","Bắt đầu phiên mới?":"Start a new session?","Chú thích vẽ thêm:":"Added annotations:","Không lưu được tệp":"Could not save the file","Không lưu, tạo mới":"Don't save, create new","Rất nét (tệp nặng)":"Very sharp (large file)","Số trong bong bóng":"Number in balloon","Thông tin tài liệu":"Document info","Tỉ lệ không hợp lệ":"Invalid scale","[không có lớp chữ]":"[no text layer]","Đang chuẩn bị OCR…":"Preparing OCR…","Đang đọc tệp Word…":"Reading Word file…","ảnh liên kết ngoài":"externally linked image","150 dpi (in thường)":"150 dpi (normal print)","Bấm để chọn trang ·":"Click to select page ·","Bằng kích thước ảnh":"Same as image size","Chọn tệp cần chuyển":"Choose files to convert","Danh sách đối tượng":"Object list","Không đọc được HTML":"Cannot read HTML","Mỗi trang một sheet":"One sheet per page","Ngôn ngữ trên trang":"Language on page","Số chữ số thập phân":"Number of decimals","Thay phiên hiện tại":"Replace current session","Xoay trang phải (R)":"Rotate page right (R)","Xoay trái (Shift+R)":"Rotate left (Shift+R)","[không nhận ra chữ]":"[no text recognized]","mỗi trang một slide":"one slide per page","Đang trích văn bản…":"Extracting text…","Đang đọc bảng tính…":"Reading spreadsheet…","Đưa xuống dưới cùng":"Send to back","(bật OCR để lấy chữ)":"(enable OCR to get text)","(trang không có chữ)":"(page has no text)","Chọn kiểu chuyển đổi":"Choose a conversion type","Chữ nghiêng (Ctrl+I)":"Italic (Ctrl+I)","Di chuột để đặt chữ,":"Move the mouse to place text,","Không chèn được ảnh:":"Could not insert image:","Không thay được ảnh:":"Could not replace image:","Lên một lớp (Ctrl+])":"Bring forward (Ctrl+])","Mở trên bàn làm việc":"Open on workbench","Sắp xếp theo tên tệp":"Sort by file name","Trang trước (PageUp)":"Previous page (PageUp)","Trang đang được chọn":"Currently selected page","Đối tượng trên trang":"Objects on page","đang đọc nét vector…":"reading vector strokes…","đường tròn hoặc cung":"circle or arc","Bỏ qua một chú thích:":"Skipped an annotation:","Chưa thiết lập bản vẽ":"Drawing not set up","Di chuột để đặt cung,":"Move the mouse to place the arc,","Lưu PDF tìm kiếm được":"Save searchable PDF","Lưu phiên rồi tạo mới":"Save session, then create new","Tỉ lệ (bản vẽ : thực)":"Scale (drawing : real)","gốc dưới vùng sửa/che":"original under edited/whited-out areas","tệp .html hoặc dán mã":".html file or paste code","Đã sao chép đối tượng":"Object copied","A4 (tự xoay ngang/dọc)":"A4 (auto landscape/portrait)","Không dựng được trang:":"Could not render page:","Sai mật khẩu, thử lại.":"Wrong password, try again.","Xem và chú thích trang":"View and annotate page","Xuống một lớp (Ctrl+[)":"Send backward (Ctrl+[)","Xóa đối tượng (Delete)":"Delete object (Delete)","chuẩn lưu trữ PDF/A-2b":"PDF/A-2b archival standard","cách nhau bởi dấu phẩy":"separated by commas","Đang nạp bộ nhận dạng…":"Loading recognizer…","Không còn gì để làm lại":"Nothing to redo","Vừa màn hình / 100% (0)":"Fit screen / 100% (0)","không tải được thư viện":"could not load library","Đang mở phiên làm việc…":"Opening work session…","Đang đóng gói tệp Word…":"Packaging Word file…","Đánh dấu chọn trang này":"Mark this page as selected","để tìm kiếm và bôi đen.":"to search and select.","Ẩn/hiện danh sách trang":"Show/hide page list","(chọn kèm cùng tệp HTML)":"(select together with the HTML file)",", gói trong một tệp .zip":", packed in one .zip file","Gộp tất cả vào một sheet":"Merge all into one sheet","Không còn gì để hoàn tác":"Nothing to undo","Nhập kích thước khổ giấy":"Enter paper size","Thả PDF hoặc ảnh vào đây":"Drop PDFs or images here","tài nguyên trên Internet":"Internet resources","Đang lưu phiên làm việc…":"Saving work session…","Đang tạo PDF có lớp chữ…":"Creating PDF with text layer…","Đang đọc nội dung trang…":"Reading page content…","Đang đọc tệp PowerPoint…":"Reading PowerPoint file…","Đã lưu thiết lập bản vẽ:":"Drawing setup saved:","Độ rộng so với cạnh ngắn":"Width relative to short edge","Chọn ít nhất một ngôn ngữ":"Select at least one language","Chữ gốc (đã xóa nội dung)":"Original text (content deleted)","Không dựng được slide nào":"No slides could be rendered","Theo kích thước trang PDF":"Same as PDF page size","Tệp không đúng loại. Cần:":"Wrong file type. Needed:","Tự chọn theo độ rộng bảng":"Auto by table width","Xem toàn màn hình (Enter)":"Full screen view (Enter)","Xoay trang trái (Shift+R)":"Rotate page left (Shift+R)","Đang đóng gói PowerPoint…":"Packaging PowerPoint…","Đã tạo phiên làm việc mới":"New work session created","Đóng dấu chìm (watermark)":"Watermark","Dán vào trang này (Ctrl+V)":"Paste on this page (Ctrl+V)","Không có ảnh nào dùng được":"No usable images","Đang nạp bộ nhận dạng chữ…":"Loading text recognizer…","Đã thêm trang trắng ở cuối":"Blank page added at the end","Bỏ số 0 thừa (12.50 → 12.5)":"Drop trailing zeros (12.50 → 12.5)","Chọn, di chuyển, đổi cỡ (V)":"Select, move, resize (V)","Giữ nguyên hình (ảnh trang)":"Keep appearance (page images)","Tệp không phải .pptx hợp lệ":"Not a valid .pptx file","Ẩn/hiện danh sách đối tượng":"Show/hide object list","Bấm vào chi tiết cần chỉ rồi":"Click the detail to point at, then","Không có trang nào để chuyển":"No pages to convert","Không khởi động được bộ OCR:":"Could not start OCR:","Không xóa được nội dung gốc:":"Could not remove original content:","Lên trên cùng (Ctrl+Shift+])":"Bring to front (Ctrl+Shift+])","Áp dụng cho tất cả các trang":"Apply to all pages","An toàn (ảnh trang + lớp chữ)":"Safe (page image + text layer)","Khổ trang bằng kích thước ảnh":"Page size = image size","Bỏ qua trang đã có sẵn lớp chữ":"Skip pages that already have a text layer","Chọn một kiểu chuyển đổi trước":"Choose a conversion type first","Xuống dưới cùng (Ctrl+Shift+[)":"Send to back (Ctrl+Shift+[)","Đang đọc chữ và ảnh của trang…":"Reading text and images on page…","· giữ Shift: đo theo đường xiên":"· hold Shift: measure along slant","<h1>Tiêu đề</h1><p>Nội dung…</p>":"<h1>Title</h1><p>Content…</p>","HTML (chọn kèm ảnh, CSS đi cùng)":"HTML (select with images, CSS)","Hình elip (giữ Shift: hình tròn)":"Ellipse (hold Shift: circle)","Không đọc được nội dung tệp Word":"Cannot read Word file content","Mũi tên (giữ Shift: bắt góc 45°)":"Arrow (hold Shift: snap 45°)","Thay ảnh khác, giữ nguyên vị trí":"Replace image, keep position","để đặt bong bóng · số tiếp theo:":"to place the balloon · next number:","Che trắng: phủ trắng một vùng (W)":"White-out: cover an area with white (W)","Chèn ảnh từ máy (hoặc dán Ctrl+V)":"Insert image from computer (or paste Ctrl+V)","Di chuột để đặt đường kích thước,":"Move the mouse to place the dimension line,","Không có dòng chữ nào trong khung":"No text lines in the box","trang đã có kết quả (sẽ dùng lại)":"pages already have results (will reuse)","Đã xóa trang · Ctrl+Z để hoàn tác":"Page deleted · Ctrl+Z to undo","Hiện (đang ẩn, sẽ không in ra PDF)":"Show (hidden, will not print to PDF)","Đặt vào khổ A4 (tự xoay ngang/dọc)":"Fit to A4 (auto landscape/portrait)","Khoảng trang (theo thứ tự trên bàn)":"Page range (in workbench order)","Nhập khoảng trang, ví dụ 1-3, 5, 8-":"Enter page range, e.g. 1-3, 5, 8-","Chép chữ của trang vào ghi chú slide":"Copy page text to slide notes","Đường thẳng (giữ Shift: bắt góc 45°)":"Line (hold Shift: snap 45°)","ảnh hỏng hoặc định dạng không hỗ trợ":"broken image or unsupported format","Hình chữ nhật (giữ Shift: hình vuông)":"Rectangle (hold Shift: square)","Tự nhận dạng chữ (OCR) cho trang scan":"Auto text recognition (OCR) for scanned pages","tệp nguồn, theo đúng thứ tự trên bàn.":"source files, in workbench order.","Nén mạnh (chuyển trang thành ảnh JPEG)":"Strong compression (pages to JPEG images)","trang dùng chữ có sẵn hoặc kết quả cũ)":"pages use existing text or earlier results)","Đổi chữ số thành số (1.234,5 → 1234.5)":"Convert numeric text to numbers (1.234,5 → 1234.5)","Đã chèn trang trắng sau trang chọn cuối":"Blank page inserted after the last selected page","Bút bôi vàng (H) · giữ Shift để kẻ thẳng":"Highlighter (H) · hold Shift for a straight line","Các đối tượng, trên cùng là lớp nằm trên":"Objects, topmost is the top layer","Mở phiên làm việc đã lưu (.plt) · Ctrl+O":"Open a saved work session (.plt) · Ctrl+O","Sao chép để dán sang trang khác (Ctrl+C)":"Copy to paste on another page (Ctrl+C)","Đã dừng. Các trang đã xong được giữ lại.":"Stopped. Finished pages were kept.","Thiết lập bản vẽ: khổ giấy, tỉ lệ, đơn vị":"Drawing setup: paper size, scale, units","biểu đồ/hình vẽ chưa hỗ trợ nên bị bỏ qua":"charts/drawings not supported yet, skipped","(kiểm tra thư mục lib nằm cạnh index.html)":"(check the lib folder next to index.html)","Bàn làm việc đang trống, chưa có gì để lưu":"Workbench is empty, nothing to save","trang (giữ dạng vector, chữ vẫn chọn được)":"pages (vector kept, text still selectable)","Đã bôi đen toàn bộ, bấm Ctrl+C để sao chép":"Everything selected, press Ctrl+C to copy",". Kích thước đo = độ dài trên giấy × tỉ lệ.":". Measured size = length on paper × scale.","Chọn một mục bên trái, rồi kéo thả tệp vào.":"Pick an item on the left, then drop files in.","Không tìm thấy chữ. Có thể đây là bản scan.":"No text found. This may be a scan.","ảnh định dạng EMF/WMF hoặc liên kết ngoài (":"EMF/WMF images or external links (","3 điểm thẳng hàng, không tạo được đường tròn":"3 collinear points, cannot make a circle","Khóa (không chọn, không kéo được trên trang)":"Lock (cannot select or drag on page)","Tệp được mã hóa: trang sẽ xuất dưới dạng ảnh":"Encrypted file: pages will be exported as images","· trang không có nét vector, chọn điểm tự do":"· page has no vector strokes, pick points freely","<> là giá trị đo. Ví dụ: 2x <>  hoặc  <> ±0.1":"<> is the measured value. E.g.: 2x <>  or  <> ±0.1","Kèm lớp chữ ẩn (tìm kiếm, bôi đen, copy được)":"With hidden text layer (searchable, selectable, copyable)","trang không có chữ nên được đặt dưới dạng ảnh":"pages have no text so were placed as images","Bắt đầu phiên làm việc mới (bàn làm việc trống)":"Start a new work session (empty workbench)","trang. Bàn làm việc hiện đang có tài liệu khác.":"pages. The workbench currently has other documents.","Đã sao chép. Mở trang khác rồi bấm Dán (Ctrl+V)":"Copied. Open another page and press Paste (Ctrl+V)","Kết quả nhận dạng sẽ hiện ở đây, từng trang một.":"Recognition results will appear here, page by page.","trang) sẽ được dọn trống. Phiên này đã được lưu.":"pages) will be cleared. This session has been saved.","” không phải tệp phiên làm việc của MrT PDFlover":"” is not a MrT PDFlover work session file","Chọn tệp .html (có thể chọn kèm ảnh, CSS đi cùng)":"Choose an .html file (you can include images, CSS)","Đã xóa nét gốc · xóa mục này ở danh sách để khôi phục":"Original stroke deleted · delete this item in the list to restore","(nét vẽ sẽ sáng cam), hoặc chọn 3 điểm trên đường tròn":"(strokes light up orange), or pick 3 points on the circle","Xóa hẳn chữ/ảnh gốc nằm dưới vùng đã sửa hoặc che trắng":"Permanently remove original text/images under edited or whited-out areas","gốc · xóa tiếp mục này ở danh sách để khôi phục bản gốc":"original · delete this item in the list to restore the original","Lưu phiên làm việc thành tệp .plt để mở lại sau · Ctrl+S":"Save the work session as a .plt file to reopen later · Ctrl+S","Đối tượng đang khóa. Mở khóa ở danh sách bên phải để xóa":"Object is locked. Unlock it in the list on the right to delete","để bạn thử. Khi bạn thêm tệp của mình, tệp mẫu sẽ tự gỡ.":"for you to try. When you add your own files, the samples are removed.","đoạn chỉ được che phủ (phông chữ thiếu thông tin độ rộng)":"runs were only covered (font lacks width info)",". Nếu cần nộp hồ sơ chính thức, có thể kiểm lại bằng veraPDF.":". For official submissions, verify with veraPDF.","Góc: chọn đỉnh, điểm trên cạnh 1, điểm trên cạnh 2 rồi đặt cung":"Angle: pick the vertex, a point on edge 1, a point on edge 2, then place the arc","Bán kính: bấm vào đường tròn/cung (hoặc chọn 3 điểm) rồi đặt chữ":"Radius: click a circle/arc (or pick 3 points), then place the text","Các thiết lập này áp dụng cho mọi tệp PDF xuất ra (cả khi tách).":"These settings apply to every exported PDF (including splits).","Đường kính: bấm vào đường tròn/cung (hoặc chọn 3 điểm) rồi đặt chữ":"Diameter: click a circle/arc (or pick 3 points), then place the text","Mỗi trang thành một ảnh. Nhiều trang sẽ được gói trong một tệp .zip.":"Each page becomes an image. Multiple pages are packed in one .zip file.","Nhận dạng ngay trên máy, không cần mạng, tệp không rời máy. Tạo được":"Recognition runs on this computer, no network needed, files never leave it. Can create","Chỉ nhận tệp PDF, ảnh (JPG, PNG, WebP, GIF…) hoặc phiên làm việc .plt":"Only PDF, images (JPG, PNG, WebP, GIF…) or .plt work sessions are accepted","Chưa có đối tượng nào. Chọn một công cụ ở thanh trên rồi vẽ lên trang.":"No objects yet. Pick a tool on the top bar and draw on the page.","PDF giữ nguyên hình trang, thêm lớp chữ vô hình để tìm kiếm và bôi đen":"PDF keeps the page appearance, adds an invisible text layer for search and selection","Chạy hoàn toàn trên máy này, không cần mạng. Tệp không rời khỏi máy bạn.":"Runs entirely on this computer, no network needed. Files never leave your machine.","Giảm dung lượng đáng kể với bản scan. Văn bản sẽ không còn chọn/tìm được.":"Greatly reduces size for scans. Text will no longer be selectable/searchable.","Bong bóng đánh số (B): bấm vào chi tiết rồi kéo ra để đặt. Số tự tăng từ 1":"Numbered balloon (B): click the detail, then drag out to place. Numbers start at 1","(đường, khung, hình tròn…) của PDF để sửa · kéo khung để gộp nhiều dòng chữ":"(lines, frames, circles…) of the PDF to edit · drag a box to merge several text lines","Sau khi mở, bản xuất ra sẽ không còn mật khẩu (trang được chuyển thành ảnh).":"After opening, the export will have no password (pages are converted to images).","Văn bản trích ra sẽ hiện ở đây. Bản scan (ảnh) không có lớp chữ nên sẽ trống.":"Extracted text will appear here. Scans (images) have no text layer, so it will be empty.","+bấm chọn một dải · kéo thả để đổi vị trí (kéo trang đã chọn sẽ kéo cả nhóm) ·":"+click selects a range · drag to reorder (dragging a selected page moves the whole group) ·","Mọi chuyển đổi chạy ngay trên máy này, không cần mạng và không gửi tệp đi đâu.":"All conversions run on this computer, no network needed, files are not sent anywhere.","Hình trang được giữ nguyên, chữ vẫn tìm kiếm được. Tệp có thể nặng hơn bản gốc.":"Page appearance is kept, text stays searchable. The file may be larger than the original.","Trang này không có chữ/ảnh dạng PDF để sửa (bản scan: dùng OCR, hoặc Che trắng + Ô chữ)":"This page has no PDF text/images to edit (scan: use OCR, or White-out + Text box)","trang) có thay đổi chưa lưu. Nếu không lưu, các thay đổi, chú thích và kích thước sẽ mất.":"pages) have unsaved changes. If not saved, changes, annotations and dimensions will be lost.","ảnh không hiển thị được (thường là định dạng EMF/WMF của Office; hãy chèn lại dưới dạng PNG/JPG)":"images could not be displayed (usually Office EMF/WMF; re-insert as PNG/JPG)","Ghép nhiều ảnh thành một tệp PDF, mỗi ảnh một trang. Ảnh chụp điện thoại được tự xoay đúng chiều.":"Combine many images into one PDF, one image per page. Phone photos are auto-rotated upright.","Bắt điểm theo nét vector của PDF: điểm cuối, trung điểm, tâm, giao điểm, trên nét. Giữ Alt để tạm tắt":"Snap to the PDF's vector strokes: endpoint, midpoint, center, intersection, on stroke. Hold Alt to disable temporarily","Trang này không có chữ hoặc ảnh dạng PDF để sửa (có thể là bản scan: dùng OCR hoặc Che trắng + Ô chữ)":"This page has no PDF text or images to edit (may be a scan: use OCR or White-out + Text box)","Giữ nguyên nội dung gốc. Chỉ đạt chuẩn nếu PDF gốc đã nhúng đủ font; nếu không chắc, dùng chế độ an toàn.":"Keeps the original content. Compliant only if the original PDF embeds all fonts; if unsure, use safe mode.","Kích thước dài (D): chọn 2 điểm rồi đặt đường kích thước. Tự nhận ngang/dọc, giữ Shift để đo theo đường xiên":"Linear dimension (D): pick 2 points, then place the dimension line. Auto horizontal/vertical, hold Shift to measure along a slant","Mỗi trang PDF thành một slide, khung slide theo tỉ lệ trang. Chữ của trang được chép vào phần ghi chú (notes).":"Each PDF page becomes a slide, slide frame matches the page ratio. Page text is copied into the notes.","Trên cùng danh sách = lớp nằm trên. Kéo thả để đổi thứ tự, bấm đúp tên để đổi tên. Đối tượng ẩn sẽ không in ra PDF.":"Top of the list = top layer. Drag to reorder, double-click a name to rename. Hidden objects are not printed to PDF.","Gộp nhiều tệp, kéo thả để sắp xếp trang, xoay, xóa, tách, đánh số trang, đóng dấu chìm, nén, xuất ảnh hoặc trích văn bản.":"Merge files, drag to reorder pages, rotate, delete, split, number pages, watermark, compress, export images or extract text.","Bảng tính được chia trang theo hàng, không cắt ngang một dòng. Giữ số liệu và định dạng số; màu ô và biểu đồ không được giữ.":"The spreadsheet is paginated by rows without cutting a row. Values and number formats are kept; cell colors and charts are not.","Nhận dạng cột theo khoảng trắng giữa các chữ, mỗi dòng chữ thành một hàng. Hợp nhất với bảng kê, báo giá, BOM xuất từ phần mềm.":"Columns are detected from gaps between words, each text line becomes a row. Suited to lists, quotes and BOMs exported from software.","Mỗi slide thành một trang PDF đúng tỉ lệ khung. Hiệu ứng chuyển động không được giữ. Tệp .ppt đời cũ cần lưu lại thành .pptx trước.":"Each slide becomes a PDF page at the slide ratio. Animations are not kept. Old .ppt files must be re-saved as .pptx first.","Sửa nội dung có sẵn của PDF (E): bấm vào dòng chữ để sửa chữ, bấm vào ảnh để di chuyển/thay/xóa. Kéo khung để gộp nhiều dòng thành một đoạn":"Edit existing PDF content (E): click a text line to edit text, click an image to move/replace/delete. Drag a box to merge several lines into one paragraph","Dựng lại trang Word như khi mở trên máy, rồi xuất PDF. Chữ hiển thị bằng font có trên máy này. Tệp .doc đời cũ cần lưu lại thành .docx trước.":"Re-renders the Word pages as on the computer, then exports PDF. Text uses fonts available on this computer. Old .doc files must be re-saved as .docx first.","Chế độ “sửa được” dựng lại đoạn văn, tiêu đề, chữ đậm và căn giữa để bạn sửa trong Word. Chế độ “giữ nguyên hình” đặt mỗi trang thành một ảnh.":"“Editable” mode rebuilds paragraphs, headings, bold and centering for editing in Word. “Keep appearance” mode turns each page into an image.","Lăn chuột: phóng to/thu nhỏ · Kéo vùng trống hoặc giữ Space: di chuyển · Bấm đúp ô chữ để sửa · V T P H W: đổi công cụ · Ctrl+Z / Ctrl+Y · Esc: thoát":"Mouse wheel: zoom · Drag empty area or hold Space: pan · Double-click a text box to edit · V T P H W: switch tool · Ctrl+Z / Ctrl+Y · Esc: exit","Tạo tệp theo chuẩn lưu trữ PDF/A-2b: nhúng hồ sơ màu sRGB, siêu dữ liệu XMP và font. Chế độ “an toàn” dựng lại trang thành ảnh kèm lớp chữ ẩn nên luôn đạt chuẩn.":"Creates a PDF/A-2b archival file: embeds the sRGB color profile, XMP metadata and fonts. “Safe” mode re-renders pages as images with a hidden text layer, so it always complies.","Chuyển trang HTML thành PDF khổ A4. Nếu trang dùng ảnh hoặc CSS ở tệp riêng (ví dụ logo.png, style.css), hãy chọn hoặc kéo thả chúng cùng lúc với tệp HTML. Script trong trang không được chạy, tài nguyên trên Internet bị bỏ qua.":"Converts an HTML page to A4 PDF. If the page uses images or CSS in separate files (e.g. logo.png, style.css), select or drop them together with the HTML file. Scripts in the page are not run; Internet resources are ignored.","Trang":"Page","trang":"pages","Xoay":"Rotate","Ngang":"Landscape","ngang":"landscape","tr.":"p.","Elip":"Ellipse","Excel sang PDF":"Excel to PDF","HTML sang PDF":"HTML to PDF","PDF sang Excel":"PDF to Excel","PDF sang PDF/A":"PDF to PDF/A","PDF sang PowerPoint":"PDF to PowerPoint","PDF sang Word":"PDF to Word","PowerPoint sang PDF":"PowerPoint to PDF","Word sang PDF":"Word to PDF","Trang 1":"Page 1","Trang 1/12":"Page 1/12","xoay ·":"rotate ·","Trang tính “":"Sheet “","Ngôn ngữ":"Language","giây":"s","Trang sau (PageDown)":"Next page (PageDown)","Trang sau":"Next page","Chọn ngôn ngữ giao diện":"Choose interface language","Thả các tệp":"Drop","Thả tệp":"Drop","Gỡ":"Remove","Dùng các trang trên bàn làm việc":"Use the workbench pages","nét gốc":"original stroke","chữ gốc":"original text","ảnh gốc":"original image","Thêm":"Add","Thay đổi trang":"Change pages","đối tượng":"objects","Xóa nội dung gốc":"Delete original content","Hiện":"Show","Đổi tên":"Rename","Sửa chữ":"Edit text","Sửa":"Edit","Đổi lớp đối tượng":"Reorder objects","Đổi thứ tự trang":"Reorder pages","Thao tác":"Action","thao tác":"actions","Lịch sử thao tác":"Action history","● Trạng thái hiện tại":"● Current state","Đang sao chép trang…":"Copying pages…","mở trang khác hoặc phiên khác rồi bấm Dán (Ctrl+V)":"open another page or session, then press Paste (Ctrl+V)","Chưa sao chép trang nào":"No pages copied yet","Đang dán trang…":"Pasting pages…","Sao chép ·":"Copy ·","Đã dán":"Pasted","· Ctrl+Z để hoàn tác":"· Ctrl+Z to undo","Đã nhân bản":"Duplicated","Đã chèn trang trắng":"Blank page inserted","Dán sau trang này":"Paste after this page","Dán trước trang này":"Paste before this page","Chèn trang trắng phía sau":"Insert blank page after","Chọn tất cả trang":"Select all pages","Đã chọn":"Selected","Phiên làm việc MrT PDFlover":"MrT PDFlover work session","Lưu đè vào":"Overwrite","Ctrl+Shift+S: lưu thành tệp khác":"Ctrl+Shift+S: save as another file","Lưu phiên làm việc thành tệp .plt để mở lại sau (Ctrl+S)":"Save the work session as a .plt file to reopen later (Ctrl+S)","Không có quyền ghi vào tệp":"No permission to write the file","Đã lưu đè":"Overwrote","Không ghi đè được":"Could not overwrite",", hãy chọn nơi lưu":", please choose where to save","Không lưu được:":"Could not save:","· lần sau Ctrl+S sẽ lưu đè tệp này":"· next time Ctrl+S overwrites this file","Đã hoàn tác:":"Undid:","Đã làm lại:":"Redid:","Hoàn tác:":"Undo:","Làm lại:":"Redo:"};
 const LANG = { cur:'vi', orig:new WeakMap(), attrs:new WeakMap(), busy:false, re:null };
 const VI_CH = /[À-ÖØ-öø-ỹĐđ]|(?<![\w.-])(?:Elip|[Xx]oay|tr\.|[Tt]rang|[Nn]gang|sang)(?![\w-])/;
 const NO_I18N = 'script,style,svg,textarea,[contenteditable],[data-noi18n],.nm,.fitem span,#v-src,.vl-name,.result b';
@@ -3468,7 +3502,7 @@ function sessionName(){
   const base = $('#out-name').value.trim() || ([...S.sources.values()].find(s => !s.temp && !s.sample && s.kind !== 'blank') ? outBase() : 'phien-lam-viec');
   return baseName(base) + '_' + d.getFullYear() + z(d.getMonth()+1) + z(d.getDate()) + '-' + z(d.getHours()) + z(d.getMinutes()) + '.plt';
 }
-async function saveSession(){
+async function saveSession(saveAs){
   if(S.busy) return false;
   commitText();
   if(!S.pages.length){ toast('Bàn làm việc đang trống, chưa có gì để lưu'); return false; }
@@ -3499,7 +3533,7 @@ async function saveSession(){
     zip.file('manifest.json', JSON.stringify(manifest));
     const blob = await zip.generateAsync({ type:'blob', compression:'DEFLATE', compressionOptions:{ level:6 } }, m => prog(m.percent / 100, 'Đang đóng gói… ' + Math.round(m.percent) + '%'));
     const name = sessionName();
-    if(await offer(name, blob)){ S.dirty = false; refreshDirty(); saved = true; }
+    if(await storeSession(name, blob, saveAs)){ S.dirty = false; refreshDirty(); saved = true; }
   });
   return saved;
 }
@@ -3511,7 +3545,7 @@ function askSessionMode(name, n){
     setTimeout(() => m.querySelector('[data-m="replace"]').focus(), 30);
   });
 }
-async function openSession(file){
+async function openSession(file, handle){
   let zip, man;
   try{
     zip = await JSZip.loadAsync(await file.arrayBuffer());
@@ -3558,7 +3592,7 @@ async function openSession(file){
         el.dispatchEvent(new Event('input')); el.dispatchEvent(new Event('change'));
       }
     }
-    if(mode === 'replace') S.dirty = false;
+    if(mode === 'replace'){ S.dirty = false; S.file = handle && /\.plt$/i.test(handle.name) ? { handle, name:handle.name } : null; refreshFileChip(); }
     render(); refreshDirty();
     const when = man.saved ? new Date(man.saved).toLocaleString('vi-VN') : '';
     toast('Đã mở phiên: ' + added + ' trang' + (notes ? ', ' + notes + ' chú thích' : '') + (when ? ' · lưu lúc ' + when : ''));
@@ -3601,19 +3635,19 @@ async function newSession(){
   }
   if(!$('#viewer').hidden) closeViewer();
   for(const s of [...S.sources.values()]) removeSource(s.id, true);
-  S.pages = []; S.undo = []; S.redo = []; OCR.clear(); VEC.clear(); ED.clip = null; S.dirty = false;
+  S.pages = []; S.undo = []; S.redo = []; OCR.clear(); VEC.clear(); ED.clip = null; S.dirty = false; S.file = null; refreshFileChip();
   resetSettings(); setScope('all', true);
   render(); refreshDirty(); toast('Đã tạo phiên làm việc mới');
 }
 $('#btn-new').onclick = newSession;
 function refreshDirty(){ const b = $('#btn-save'); if(b) b.classList.toggle('dirty', !!S.dirty && S.pages.length > 0); }
-$('#btn-save').onclick = saveSession;
-$('#btn-open').onclick = () => $('#plt-input').click();
+$('#btn-save').onclick = e => saveSession(e.shiftKey);
+$('#btn-open').onclick = () => pickSessionToOpen();
 $('#plt-input').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if(f) openSession(f); };
 document.addEventListener('keydown', e => {
   const mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
-  if(mod && k === 's'){ e.preventDefault(); e.stopPropagation(); saveSession(); }
-  else if(mod && k === 'o'){ e.preventDefault(); e.stopPropagation(); $('#plt-input').click(); }
+  if(mod && k === 's'){ e.preventDefault(); e.stopPropagation(); saveSession(e.shiftKey); }
+  else if(mod && k === 'o'){ e.preventDefault(); e.stopPropagation(); pickSessionToOpen(); }
 }, true);
 window.addEventListener('beforeunload', e => { if(S.dirty && S.pages.length){ e.preventDefault(); e.returnValue = ''; } });
 
@@ -3626,6 +3660,319 @@ const ICON_EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const ICON_EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3l18 18M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7c1.8 0 3.4-.5 4.8-1.3"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
 const ICON_LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 const ICON_UNLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/></svg>';
+/* =====================================================================
+   HISTORY PANEL, PAGE CLIPBOARD AND PAGE CONTEXT MENU
+   - History labels are worked out by comparing two saved states, so every
+     existing snapshot() call gets a readable name without extra code.
+   - Copied pages carry their own PDF bytes (one small PDF per source), so
+     they can be pasted after "New session" or "Open session".
+   ===================================================================== */
+const annKindName = a => a.type === 'gone' ? 'nét gốc' : a.type === 'vec' ? 'nét gốc' : a.cover && a.type === 'text' ? 'chữ gốc' : a.cover && a.type === 'image' ? 'ảnh gốc'
+  : (TYPE_NAME[a.type] || a.type).toLowerCase();
+function histLabel(a, b){
+  const ua = new Map(a.map((p, i) => [p.uid, [p, i]])), ub = new Map(b.map((p, i) => [p.uid, [p, i]]));
+  const added = b.filter(p => !ua.has(p.uid)).length, removed = a.filter(p => !ub.has(p.uid)).length;
+  if(added && !removed) return added > 1 ? 'Thêm ' + added + ' trang' : 'Thêm trang';
+  if(removed && !added) return removed > 1 ? 'Xóa ' + removed + ' trang' : 'Xóa trang';
+  if(added || removed) return 'Thay đổi trang';
+  let rot = 0;
+  for(const q of b){
+    const [p] = ua.get(q.uid), n = ub.get(q.uid)[1] + 1;
+    if((p.ann || []) !== (q.ann || []) && (p.ann || []).length + (q.ann || []).length){
+      const A = p.ann || [], B = q.ann || [], ia = new Map(A.map(x => [x.id, x])), ib = new Map(B.map(x => [x.id, x]));
+      const plus = B.filter(x => !ia.has(x.id)), minus = A.filter(x => !ib.has(x.id)), chg = B.filter(x => ia.has(x.id) && ia.get(x.id) !== x);
+      const tag = ' · tr.' + n;
+      if(plus.length) return (plus.length > 1 ? 'Thêm ' + plus.length + ' đối tượng' : 'Thêm ' + annKindName(plus[0])) + tag;
+      if(minus.length) return (minus.length > 1 ? 'Xóa ' + minus.length + ' đối tượng' : 'Xóa ' + annKindName(minus[0])) + tag;
+      if(chg.length){
+        const x = chg[0], o = ia.get(x.id);
+        if(x.type === 'gone' || (x.type === 'white' && x.erased && o.type !== 'white')) return 'Xóa nội dung gốc' + tag;
+        if(!!x.hidden !== !!o.hidden) return (x.hidden ? 'Ẩn ' : 'Hiện ') + annKindName(x) + tag;
+        if(!!x.locked !== !!o.locked) return (x.locked ? 'Khóa ' : 'Mở khóa ') + annKindName(x) + tag;
+        if(x.name !== o.name) return 'Đổi tên ' + annKindName(x) + tag;
+        if(x.text !== o.text && x.text != null) return 'Sửa chữ' + tag;
+        return 'Sửa ' + annKindName(x) + tag;
+      }
+      if(A.length === B.length) return 'Đổi lớp đối tượng' + tag;
+    }
+    if(JSON.stringify(p.dwg || null) !== JSON.stringify(q.dwg || null)) return 'Thiết lập bản vẽ · tr.' + n;
+    if(p.rot !== q.rot) rot++;
+  }
+  if(rot) return 'Xoay ' + rot + ' trang';
+  if(a.some((p, i) => p.uid !== b[i].uid)) return 'Đổi thứ tự trang';
+  return 'Thao tác';
+}
+function histItems(){
+  const U = S.undo, R = S.redo, past = [], future = [];
+  for(let i = U.length - 1; i >= 0; i--) past.push(histLabel(U[i], i + 1 < U.length ? U[i + 1] : S.pages));
+  for(let j = R.length - 1; j >= 0; j--) future.push(histLabel(j + 1 < R.length ? R[j + 1] : S.pages, R[j]));
+  return { past, future };   // past[0] = most recent action, future[0] = next redo
+}
+function stepHistory(n){
+  commitText(); ED.changed = false;
+  const go = n < 0 ? undo : redo; let k = 0;
+  for(let i = 0; i < Math.abs(n); i++){ if(!(n < 0 ? S.undo : S.redo).length) break; go(true); k++; }
+  if(k) toast((n < 0 ? 'Đã hoàn tác ' : 'Đã làm lại ') + k + ' thao tác');
+}
+function refreshHist(){
+  const { past, future } = histItems();
+  const set = (id, lab, pre, key) => { const b = $('#' + id); if(!b) return; b.disabled = !lab; b.title = lab ? pre + ': ' + lab + ' (' + key + ')' : pre + ' (' + key + ')'; };
+  set('t-undo', past[0], 'Hoàn tác', 'Ctrl+Z'); set('t-redo', future[0], 'Làm lại', 'Ctrl+Y');
+  set('p-undo', past[0], 'Hoàn tác', 'Ctrl+Z'); set('p-redo', future[0], 'Làm lại', 'Ctrl+Y');
+  ['t-hist', 'p-hist'].forEach(id => { const b = $('#' + id); if(b) b.disabled = !past.length && !future.length; });
+}
+
+/* ---------- floating menu (context menu and history list) ---------- */
+let MENU = null;
+function closeMenu(){ if(MENU){ MENU.remove(); MENU = null; } }
+function openMenu(x, y, items, cls){
+  closeMenu();
+  const m = document.createElement('div'); m.className = 'cmenu' + (cls ? ' ' + cls : ''); m.setAttribute('role', 'menu');
+  items.forEach(it => {
+    if(it === '-'){ const s = document.createElement('div'); s.className = 'cm-sep'; m.appendChild(s); return; }
+    if(it.head){ const h = document.createElement('div'); h.className = 'cm-head'; h.textContent = it.head; m.appendChild(h); return; }
+    const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.className = 'cm-item' + (it.cls ? ' ' + it.cls : '');
+    b.disabled = !!it.disabled;
+    b.innerHTML = '<span class="cm-l"></span>' + (it.key ? '<kbd>' + esc(it.key) + '</kbd>' : '');
+    b.querySelector('.cm-l').textContent = it.label;
+    b.onclick = () => { closeMenu(); it.run(); };
+    m.appendChild(b);
+  });
+  document.body.appendChild(m); MENU = m;
+  const r = m.getBoundingClientRect(), W = innerWidth, H = innerHeight;
+  m.style.left = Math.max(6, Math.min(x, W - r.width - 6)) + 'px';
+  m.style.top = Math.max(6, Math.min(y, H - r.height - 6)) + 'px';
+  const first = m.querySelector('.cm-item:not(:disabled)'); if(first) first.focus({ preventScroll:true });
+  return m;
+}
+document.addEventListener('pointerdown', e => { if(MENU && !MENU.contains(e.target)) closeMenu(); }, true);
+document.addEventListener('keydown', e => {
+  if(!MENU) return;
+  if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); closeMenu(); return; }
+  if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    e.preventDefault(); e.stopPropagation();
+    const its = [...MENU.querySelectorAll('.cm-item:not(:disabled)')], i = its.indexOf(document.activeElement);
+    its[(i + (e.key === 'ArrowDown' ? 1 : -1) + its.length) % its.length]?.focus();
+  }
+}, true);
+window.addEventListener('resize', closeMenu);
+window.addEventListener('blur', closeMenu);
+function showHistory(btn){
+  if(MENU && MENU.dataset.for === btn.id){ closeMenu(); return; }
+  const { past, future } = histItems(), items = [];
+  const MAXN = 25;
+  if(future.length){
+    items.push({ head:'Làm lại' });
+    future.slice(0, MAXN).reverse().forEach((lab, k, arr) => { const n = arr.length - k; items.push({ label:lab, cls:'cm-future', run:() => stepHistory(n) }); });
+  }
+  items.push({ label:'● Trạng thái hiện tại', cls:'cm-now', disabled:true, run(){} });
+  if(past.length){
+    items.push({ head:'Hoàn tác' });
+    past.slice(0, MAXN).forEach((lab, k) => items.push({ label:lab, run:() => stepHistory(-(k + 1)) }));
+  }
+  const r = btn.getBoundingClientRect();
+  const m = openMenu(r.left, r.bottom + 6, items, 'cm-hist'); m.dataset.for = btn.id;
+  const now = m.querySelector('.cm-now'); if(now) now.scrollIntoView({ block:'center' });
+}
+
+/* ---------- page clipboard ---------- */
+const PCLIP = { items:null, files:null };
+async function clipPages(list){
+  if(!list.length) return;
+  await guard('Đang sao chép trang…', async () => {
+    const groups = new Map(), items = [];
+    for(let n = 0; n < list.length; n++){
+      const p = list[n], s = S.sources.get(p.src); if(!s) continue;
+      prog(n / list.length);
+      const pre = p.src + ':' + p.index + ':';
+      const it = { kind:s.kind, name:s.name, rot:p.rot, ann:(p.ann || []).map(a => ({ ...a })), dwg:p.dwg ? { ...p.dwg } : undefined,
+        ocr:[...OCR].filter(([k]) => k.startsWith(pre)).map(([k, v]) => [k.slice(pre.length), v]) };
+      if(s.kind === 'pdf' && s.lib && !s.rasterOnly){
+        if(!groups.has(s.id)) groups.set(s.id, []);
+        const g = groups.get(s.id); let j = g.indexOf(p.index); if(j < 0){ g.push(p.index); j = g.length - 1; }
+        it.grp = s.id; it.j = j;
+      }else if(s.kind === 'pdf'){
+        const r = await renderEntry({ ...p, rot:0 }, 200, 'auto', { ann:false });
+        it.kind = 'image'; it.mime = 'image/png'; it.bytes = await canvasBytes(r.canvas, 'image/png'); freeCanvas(r.canvas);
+      }else if(s.kind === 'image'){ it.bytes = s.bytes.slice(); it.mime = s.mime; }
+      items.push(it);
+    }
+    const files = {};
+    for(const [sid, idx] of groups){
+      const s = S.sources.get(sid), d = await PDFDocument.create();
+      (await d.copyPages(s.lib, idx)).forEach(pg => d.addPage(pg));
+      files[sid] = { name:s.name, bytes:await d.save({ useObjectStreams:false }) };
+    }
+    PCLIP.items = items; PCLIP.files = files;
+  });
+  if(PCLIP.items) toast('Đã sao chép ' + PCLIP.items.length + ' trang · mở trang khác hoặc phiên khác rồi bấm Dán (Ctrl+V)');
+}
+async function pasteClip(at){
+  if(!PCLIP.items || !PCLIP.items.length){ toast('Chưa sao chép trang nào'); return; }
+  if(S.busy) return;
+  removeSample(); snapshot();
+  const made = [];
+  await guard('Đang dán trang…', async () => {
+    const map = {};
+    for(const [gid, f] of Object.entries(PCLIP.files)){
+      const n0 = S.pages.length, src = await addPdf('Sao chép · ' + f.name, f.bytes.slice(), false, true);
+      S.pages.splice(n0); map[gid] = src;
+    }
+    for(const it of PCLIP.items){
+      let src, index = 0;
+      if(it.grp){ src = map[it.grp]; index = it.j; }
+      else if(it.kind === 'image') src = await addImage('Sao chép · ' + it.name, it.bytes.slice(), it.mime, false);
+      else src = blankSource();
+      if(!src) continue;
+      const pg = { uid:newUid(), src:src.id, index, rot:it.rot || 0, sel:false };
+      if(it.ann.length) pg.ann = it.ann.map(a => ({ ...a, id:nid() }));
+      if(it.dwg) pg.dwg = { ...it.dwg };
+      for(const [suf, v] of it.ocr || []) OCR.set(src.id + ':' + index + ':' + suf, v);
+      made.push(pg);
+    }
+  });
+  if(!made.length){ S.undo.pop(); return; }
+  at = Math.max(0, Math.min(at == null ? S.pages.length : at, S.pages.length));
+  S.pages.splice(at, 0, ...made);
+  if(!$('#viewer').hidden){ V.idx = at; V.rkey = null; V.ssel = new Set(made.map(p => p.uid)); }
+  render(); toast('Đã dán ' + made.length + ' trang');
+}
+
+/* ---------- page actions shared by the viewer list and the workbench ---------- */
+function pagesDelete(list){
+  if(!list.length) return;
+  const first = Math.min(...list.map(p => S.pages.indexOf(p)));
+  del(list);
+  if(!$('#viewer').hidden && S.pages.length){ V.idx = Math.min(first, S.pages.length - 1); V.rkey = null; V.ssel = new Set([S.pages[V.idx].uid]); viewerSync(); }
+  toast('Đã xóa ' + list.length + ' trang · Ctrl+Z để hoàn tác');
+}
+function pagesDuplicate(list){
+  if(!list.length) return;
+  snapshot(); const set = new Set(list.map(p => p.uid)), out = [], made = [];
+  S.pages.forEach(p => { out.push(p); if(set.has(p.uid)){ const c = { ...p, uid:newUid(), sel:false }; out.push(c); made.push(c); } });
+  S.pages = out;
+  if(!$('#viewer').hidden){ V.idx = S.pages.indexOf(made[0]); V.rkey = null; V.ssel = new Set(made.map(p => p.uid)); }
+  render(); toast('Đã nhân bản ' + list.length + ' trang');
+}
+function pagesBlankAfter(p){
+  removeSample(); snapshot(); const s = blankSource(), pg = { uid:newUid(), src:s.id, index:0, rot:0, sel:false };
+  const i = S.pages.indexOf(p) + 1; S.pages.splice(i, 0, pg);
+  if(!$('#viewer').hidden){ V.idx = i; V.rkey = null; V.ssel = new Set([pg.uid]); }
+  render(); toast('Đã chèn trang trắng');
+}
+function pageMenuItems(list, anchor, where){
+  const n = list.length, cnt = n > 1 ? ' (' + n + ' trang)' : '', clipN = PCLIP.items ? PCLIP.items.length : 0;
+  const at = S.pages.indexOf(anchor);
+  const items = [];
+  if(where === 'bench') items.push({ label:'Xem toàn màn hình', key:'Enter', run:() => openViewer(at) }, '-');
+  items.push(
+    { label:'Sao chép' + cnt, key:'Ctrl+C', run:() => clipPages(list) },
+    { label:'Dán sau trang này' + (clipN ? ' (' + clipN + ' trang)' : ''), key:'Ctrl+V', disabled:!clipN, run:() => pasteClip(S.pages.indexOf(anchor) + 1) },
+    { label:'Dán trước trang này', disabled:!clipN, run:() => pasteClip(S.pages.indexOf(anchor)) },
+    { label:'Nhân bản' + cnt, key:'Ctrl+D', run:() => pagesDuplicate(list) },
+    '-',
+    { label:'Xoay phải' + cnt, key:'R', run:() => rotate(list, 90) },
+    { label:'Xoay trái' + cnt, key:'Shift+R', run:() => rotate(list, -90) },
+    { label:'Chèn trang trắng phía sau', run:() => pagesBlankAfter(anchor) },
+    '-',
+    { label:'Chọn tất cả trang', key:'Ctrl+A', run:() => where === 'bench' ? (S.pages.forEach(p => p.sel = true), render()) : sideSelectAll() },
+    { label:'Xóa trang' + cnt, key:'Delete', cls:'cm-danger', run:() => pagesDelete(list) }
+  );
+  return items;
+}
+
+/* ---------- viewer page list: multi-select, Delete, right-click ---------- */
+V.ssel = new Set(); V.anchor = null; V.sideFocus = false;
+function sidePages(){
+  const set = V.ssel, list = S.pages.filter(p => set.has(p.uid));
+  return list.length ? list : (curPage() ? [curPage()] : []);
+}
+function sideSelectAll(){ V.ssel = new Set(S.pages.map(p => p.uid)); markSide(false); toast('Đã chọn ' + S.pages.length + ' trang'); }
+$('#v-side').addEventListener('pointerdown', () => { V.sideFocus = true; $('#v-side').classList.add('focus'); });
+['#v-stage', '.ribbon', '#v-layers', '.vbar'].forEach(sel => { const el = $(sel); if(el) el.addEventListener('pointerdown', () => { V.sideFocus = false; $('#v-side').classList.remove('focus'); }); });
+$('#v-list').addEventListener('contextmenu', e => {
+  const t = e.target.closest('.vt'); if(!t) return;
+  e.preventDefault(); V.sideFocus = true; $('#v-side').classList.add('focus');
+  const i = +t.dataset.i, p = S.pages[i]; if(!p) return;
+  if(!V.ssel.has(p.uid)){ viewerGo(i); V.ssel = new Set([p.uid]); V.anchor = p.uid; markSide(false); }
+  openMenu(e.clientX, e.clientY, pageMenuItems(sidePages(), p, 'viewer'));
+});
+function sideKey(e){
+  if(!V.sideFocus || $('#viewer').hidden) return false;
+  const k = e.key, mod = e.ctrlKey || e.metaKey, kl = k.toLowerCase();
+  if(!mod && (k === 'Delete' || k === 'Backspace') && !ED.pend){ e.preventDefault(); pagesDelete(sidePages()); return true; }
+  if(mod && kl === 'c'){ e.preventDefault(); clipPages(sidePages()); return true; }
+  if(mod && kl === 'v' && PCLIP.items){ e.preventDefault(); pasteClip(V.idx + 1); return true; }
+  if(mod && kl === 'd'){ e.preventDefault(); pagesDuplicate(sidePages()); return true; }
+  if(mod && kl === 'a'){ e.preventDefault(); sideSelectAll(); return true; }
+  if(!mod && kl === 'r'){ e.preventDefault(); rotate(sidePages(), e.shiftKey ? -90 : 90); return true; }
+  if(!mod && (k === 'ArrowDown' || k === 'ArrowUp')){ e.preventDefault(); viewerGo(V.idx + (k === 'ArrowDown' ? 1 : -1)); return true; }
+  if(k === 'Escape' && V.ssel.size > 1){ e.preventDefault(); V.ssel = new Set([curPage().uid]); markSide(false); return true; }
+  return false;
+}
+
+/* ---------- workbench: right-click, Ctrl+C / Ctrl+V / Ctrl+D ---------- */
+grid.addEventListener('contextmenu', e => {
+  const card = e.target.closest('.card'); if(!card) return;
+  e.preventDefault();
+  const p = byUid(card.dataset.uid); if(!p) return;
+  if(!p.sel){ S.pages.forEach(x => x.sel = false); p.sel = true; S.last = p.uid; render(); }
+  openMenu(e.clientX, e.clientY, pageMenuItems(selected(), p, 'bench'));
+});
+document.addEventListener('keydown', e => {
+  if(!$('#viewer').hidden || MENU || e.target.closest('input,textarea,select')) return;
+  if(!$('#pw-modal').hidden || !$('#plt-modal').hidden || !$('#ask-modal').hidden) return;
+  if($('#view-convert') && !$('#view-convert').hidden) return;
+  const mod = e.ctrlKey || e.metaKey, kl = e.key.toLowerCase();
+  if(!mod) return;
+  if(kl === 'c' && selected().length){ e.preventDefault(); clipPages(selected()); }
+  else if(kl === 'v' && PCLIP.items){ e.preventDefault(); const sel = selected(); pasteClip(sel.length ? S.pages.indexOf(sel[sel.length - 1]) + 1 : S.pages.length); }
+  else if(kl === 'd' && selected().length){ e.preventDefault(); pagesDuplicate(selected()); }
+});
+
+/* ---------- undo / redo / history buttons ---------- */
+$('#t-redo').onclick = () => redo();
+$('#t-hist').onclick = e => showHistory(e.currentTarget);
+$('#p-hist').onclick = e => { commitText(); showHistory(e.currentTarget); };
+refreshHist();
+
+/* ---------- save over the same .plt file (File System Access API, Chrome/Edge) ---------- */
+S.file = null;   // { handle, name } of the session file this work was opened from / last saved to
+const canPick = () => typeof window.showSaveFilePicker === 'function' && typeof window.PDFL_SAVE !== 'function';
+const PLT_TYPES = [{ description:'Phiên làm việc MrT PDFlover', accept:{ 'application/octet-stream':['.plt'] } }];
+function refreshFileChip(){
+  const b = $('#btn-save'); if(!b) return;
+  b.title = S.file ? 'Lưu đè vào ' + S.file.name + ' (Ctrl+S) · Ctrl+Shift+S: lưu thành tệp khác' : 'Lưu phiên làm việc thành tệp .plt để mở lại sau (Ctrl+S)';
+}
+async function writeHandle(h, blob){
+  if(h.queryPermission && (await h.queryPermission({ mode:'readwrite' })) !== 'granted'){
+    if(!h.requestPermission || (await h.requestPermission({ mode:'readwrite' })) !== 'granted') throw new Error('Không có quyền ghi vào tệp');
+  }
+  const w = await h.createWritable(); await w.write(blob); await w.close();
+}
+async function storeSession(name, blob, saveAs){
+  if(!canPick()) return offer(name, blob);
+  let h = !saveAs && S.file && S.file.handle;
+  if(h){
+    try{ await writeHandle(h, blob); toast('Đã lưu đè ' + S.file.name + ' · ' + fmtSize(blob.size)); return true; }
+    catch(e){ console.warn(e); toast('Không ghi đè được ' + S.file.name + ', hãy chọn nơi lưu'); h = null; }
+  }
+  try{ h = await window.showSaveFilePicker({ suggestedName:(saveAs && S.file) ? S.file.name : name, types:PLT_TYPES, excludeAcceptAllOption:false }); }
+  catch(e){ if(e && e.name === 'AbortError') return false; console.warn(e); return offer(name, blob); }
+  try{ await writeHandle(h, blob); }catch(e){ toast('Không lưu được: ' + (e.message || e)); return false; }
+  S.file = { handle:h, name:h.name }; refreshFileChip();
+  toast('Đã lưu ' + h.name + ' · ' + fmtSize(blob.size) + ' · lần sau Ctrl+S sẽ lưu đè tệp này');
+  return true;
+}
+async function pickSessionToOpen(){
+  if(!canPick() || typeof window.showOpenFilePicker !== 'function'){ $('#plt-input').click(); return; }
+  let hs;
+  try{ hs = await window.showOpenFilePicker({ types:[{ description:'Phiên làm việc MrT PDFlover', accept:{ 'application/octet-stream':['.plt', '.zip'] } }], multiple:false }); }
+  catch(e){ if(!(e && e.name === 'AbortError')) $('#plt-input').click(); return; }
+  const h = hs[0]; openSession(await h.getFile(), h);
+}
+refreshFileChip();
+
 function annLabel(a){
   if(a.name){
     if(LANG.cur === 'en' && a.type === 'gone'){ const m = /^Đã xóa (.+) gốc$/.exec(a.name); if(m) return 'Deleted original ' + trEN(m[1].replace(/^./, c => c.toUpperCase())).toLowerCase(); }
