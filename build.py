@@ -9,6 +9,19 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, 'src', 'app.src.html')
 APP = os.path.join(HERE, 'app')
 
+def icon_links(icon_dir):
+    # Nhúng icon ứng dụng (favicon) dạng data URI vào <head> để Chrome/Edge dùng cho tab và shortcut
+    import base64
+    out = ''
+    svg = os.path.join(icon_dir, 'pdflover.svg')
+    if os.path.exists(svg):
+        out += '<link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,' + base64.b64encode(open(svg, 'rb').read()).decode() + '">'
+    for s in (32, 192, 256):
+        p = os.path.join(icon_dir, 'pdflover-%d.png' % s)
+        if os.path.exists(p):
+            out += '<link rel="icon" type="image/png" sizes="%dx%d" href="data:image/png;base64,%s">' % (s, s, base64.b64encode(open(p, 'rb').read()).decode())
+    return out
+
 CSP = ("default-src 'none'; "
        "script-src 'self' file: blob: 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; "
        "worker-src 'self' file: blob:; "
@@ -24,6 +37,7 @@ HEAD = ('<!doctype html><html lang="vi"><head><meta charset="utf-8">'
         '<meta http-equiv="Content-Security-Policy" content="' + CSP + '">'
         '<meta name="referrer" content="no-referrer">'
         '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
+        '<title>MrT PDFlover</title>' + icon_links(os.path.join(HERE, 'src', 'icon')) +
         '<style>:root{color-scheme:light}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>'
         '</head><body>\n')
 
